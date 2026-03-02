@@ -1,0 +1,131 @@
+<!DOCTYPE html><html lang="pt-BR"><head>
+    
+    <script src="js/latest.js" data-utmify-prevent-xcod-sck="" data-utmify-prevent-subids="" async="" defer=""></script>
+
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verificação</title>
+
+  <style>
+    * { box-sizing: border-box; }
+    body{
+      margin:0;
+      height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:#f3f7fa;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Ubuntu,"Helvetica Neue",Arial,sans-serif;
+      color:#111827;
+    }
+
+    .wrap{
+      width:min(520px, 92vw);
+      text-align:center;
+      padding:40px 24px;
+    }
+
+    .title{
+      font-size:22px;
+      font-weight:700;
+      margin:16px 0 10px;
+    }
+
+    .desc{
+      font-size:15px;
+      color:#6b7280;
+      line-height:1.4;
+      margin:0;
+    }
+
+    /* Loader */
+    .spinner{
+      width:56px;
+      height:56px;
+      margin:0 auto 6px;
+      border-radius:50%;
+      border:6px solid rgba(79,124,255,.18);
+      border-top-color:#4f7cff;
+      animation:spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    /* Success icon */
+    .shield{
+      width:56px;
+      height:56px;
+      margin:0 auto 6px;
+    }
+
+    .btn{
+      display:inline-block;
+      margin-top:22px;
+      background:#4f7cff;
+      color:#fff;
+      text-decoration:none;
+      padding:12px 28px;
+      border-radius:6px;
+      font-size:15px;
+      font-weight:600;
+      transition:.2s;
+    }
+    .btn:hover{ background:#3b66e0; }
+
+    /* Step visibility */
+    .step{ display:none; }
+    .step.active{ display:block; }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+
+    <!-- ETAPA 1: carregando -->
+    <div id="stepLoading" class="step active" aria-live="polite">
+      <div class="spinner" aria-label="Carregando"></div>
+      <div class="title">Analisando sua conexão</div>
+      <p class="desc">
+        Estamos verificando a integridade do acesso<br>
+        para garantir uma navegação segura.
+      </p>
+    </div>
+
+    <!-- ETAPA 2: sucesso -->
+    <div id="stepOk" class="step" aria-live="polite">
+      <div class="shield" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M12 2L4 5V11C4 16.55 7.84 21.74 12 22C16.16 21.74 20 16.55 20 11V5L12 2Z" fill="#22c55e"></path>
+          <path d="M10.5 12.5L9 11L7.5 12.5L10.5 15.5L16.5 9.5L15 8L10.5 12.5Z" fill="#ffffff"></path>
+        </svg>
+      </div>
+
+      <div class="title">Conexão Segura</div>
+      <p class="desc">
+        Sua conexão foi verificada e está segura. Pode<br>
+        prosseguir.
+      </p>
+
+      <a id="btnGo" class="btn" href="#">Prosseguir para o Site</a>
+    </div>
+
+  </div>
+
+  <script>
+    // CONFIG
+    const DELAY_MS = 2000; // 5 segundos
+    const REDIRECT_URL = "/consulte/"; 
+
+    // aplica URL no botão
+    document.getElementById("btnGo").href = REDIRECT_URL;
+
+    // troca de etapas
+    setTimeout(() => {
+      document.getElementById("stepLoading").classList.remove("active");
+      document.getElementById("stepOk").classList.add("active");
+    }, DELAY_MS);
+  </script>
+
+
+
+</body></html>

