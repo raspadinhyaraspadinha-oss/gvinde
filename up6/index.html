@@ -75,7 +75,7 @@
 <body>
   <nav class="navbar">
     <div class="menu-icon">
-      <img src="images/logo-jadlog.png" alt="Logo" onerror="this.style.display='none'">
+      <img src="../chat/images/Gov-br-logo-svg.png" alt="Logo Gov.br" onerror="this.style.display='none'">
     </div>
     <div></div>
     <div class="menu-icon" style="color:#fff;font-size:24px;">&#9776;</div>
@@ -134,7 +134,9 @@
     var pixKey = (params.get("chave_pix") || params.get("cpf") || cpf).trim();
     var leadPhone = (params.get("phone") || params.get("telefone") || "").replace(/\D/g, "");
 
-    var sessionId = localStorage.getItem(SESSION_KEY) || "";
+    // Não reaproveitar sessões antigas ao reabrir a página (anti-flood só dentro da mesma visita)
+    try { localStorage.removeItem(SESSION_KEY); } catch (e) {}
+    var sessionId = "";
     var pollTimer = null;
     var pollStartedAt = 0;
     var expiresAtRaw = null;
