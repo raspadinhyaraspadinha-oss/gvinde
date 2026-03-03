@@ -3,7 +3,7 @@ const API_CHECK = "../checkout/api/check-payment.php";
 const SESSION_KEY = "up2CheckoutSessionId";
 const POLL_INTERVAL_MS = 5000;
 const POLL_MAX_MS = 10 * 60 * 1000;
-const DEFAULT_NEXT_URL = "../index.html";
+const DEFAULT_NEXT_URL = "../up3/index.html";
 const UP2_AMOUNT_CENTS = 3582;
 
 const params = new URLSearchParams(window.location.search);
@@ -147,9 +147,7 @@ function onPaid() {
       content_name: "PIX up2"
     });
   }
-  setTimeout(() => {
-    window.location.href = nextUrl + window.location.search;
-  }, 2200);
+  window.location.href = nextUrl + window.location.search;
 }
 
 function startPolling() {

