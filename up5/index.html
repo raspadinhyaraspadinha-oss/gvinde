@@ -25,8 +25,38 @@
     .content .highlight { font-weight: bold; color: #0eab3f; }
     .button { display: inline-block; margin-top: 1.5rem; padding: 0.8rem 1.5rem; font-size: 1rem; font-weight: bold; color: #fff; background: #0eab3f; border: none; border-radius: 25px; cursor: pointer; }
     .button:hover { background: #09912e; }
-    .up5-pix-box { display: none; margin-top: 1.5rem; padding: 1rem; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; text-align: center; }
-    .up5-pix-box.show { display: block; }
+    .up5-pix-box {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background: rgba(15, 23, 42, 0.85);
+      z-index: 9999;
+    }
+    .up5-pix-box.show { display: flex; }
+    .up5-modal {
+      width: 100%;
+      max-width: 360px;
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 16px 16px 18px;
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.45);
+    }
+    .up5-modal h3 {
+      margin: 0 0 8px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #111827;
+      text-align: center;
+    }
+    .up5-modal p {
+      margin: 0 0 10px;
+      font-size: 12px;
+      color: #4b5563;
+      text-align: center;
+    }
     .up5-pix-code { font-size: 11px; word-break: break-all; max-height: 70px; overflow: auto; padding: 8px; background: #fff; border-radius: 8px; margin: 10px 0; border: 1px solid #e5e7eb; }
     .up5-pix-actions { display: flex; gap: 8px; justify-content: center; margin-top: 8px; }
     .up5-pix-actions button { padding: 10px 16px; border-radius: 8px; border: 1px solid #d1d5db; background: #f9fafb; font-weight: 600; cursor: pointer; }
@@ -60,14 +90,18 @@
     <button id="paymentButton" class="button">Pagar Tarifa e Desbloquear Saldo</button>
 
     <div id="up5PixBox" class="up5-pix-box">
-      <div id="up5Qrcode"></div>
-      <div id="up5PixCode" class="up5-pix-code">Aguardando código PIX...</div>
-      <div class="up5-pix-actions">
-        <button id="up5Copy">Copiar código</button>
-        <button id="up5Verify">Já paguei - Verificar</button>
+      <div class="up5-modal">
+        <h3>Escaneie o QR Code para pagar</h3>
+        <p>Use o app do seu banco para ler o código abaixo ou copie o código PIX.</p>
+        <div id="up5Qrcode"></div>
+        <div id="up5PixCode" class="up5-pix-code">Aguardando código PIX...</div>
+        <div class="up5-pix-actions">
+          <button id="up5Copy">Copiar código</button>
+          <button id="up5Verify">Já paguei - Verificar</button>
+        </div>
+        <div class="up5-timer">Tempo restante: <span id="up5Timer">--:--</span></div>
+        <div id="up5Status" class="up5-status"></div>
       </div>
-      <div class="up5-timer">Tempo restante: <span id="up5Timer">--:--</span></div>
-      <div id="up5Status" class="up5-status"></div>
     </div>
   </div>
 
@@ -118,6 +152,12 @@
     function createPayment() {
       var btn = document.getElementById("paymentButton");
       if (btn) btn.disabled = true;
+
+      if (sessionId) {
+        document.getElementById("up5PixBox").classList.add("show");
+        showStatus("Você já tem um PIX ativo para esta etapa. Use o mesmo código ou clique em 'Já paguei - Verificar'.", "error");
+        return;
+      }
 
       var contact = buildContact();
       var storedUtms = typeof getStoredUtms === "function" ? getStoredUtms() : {};

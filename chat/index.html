@@ -660,7 +660,7 @@
     }
 
     async function askEmpresaNoCelular() {
-      await botSay("Você já instalou ou acessou o app da empresa no seu celular?");
+      await botSay("Você já instalou ou acessou o app GOV.br no seu celular?");
       appendOptions(["Sim", "Não"], "green", async (selected) => {
         state.empresaNoCelular = selected;
         appendUserText(selected);
@@ -719,7 +719,7 @@
     }
 
     async function confirmarPix() {
-      await botSay(`<b>ATENÇÃO:</b> Verifique se a chave PIX informada está correta.<br><br><b>${state.pixValor}</b><br><br>A empresa não se responsabiliza por chave PIX informada incorretamente.`);
+      await botSay(`<b>ATENÇÃO:</b> Verifique se a chave PIX informada está correta.<br><br><b>${state.pixValor}</b><br><br>O Governo não se responsabiliza por chave PIX informada incorretamente.`);
       appendOptions(["Sim, está correto."], "blue", async (selected) => {
         appendUserText(selected);
         await wait(CHAT_TIMING.afterUserReplyMs);
