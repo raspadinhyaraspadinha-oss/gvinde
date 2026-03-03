@@ -1014,8 +1014,8 @@
           </div>
         </div>
       `;
-      const header = elements.fbContainer.querySelector(".fb-header");
-      elements.fbContainer.insertBefore(item, header || elements.fbContainer.firstChild);
+      const firstComment = elements.fbContainer.querySelector(".comment-item");
+      elements.fbContainer.insertBefore(item, firstComment || elements.fbContainer.querySelector(".fb-header") || elements.fbContainer.firstChild);
     }
 
     function saveComments() {
