@@ -1,0 +1,154 @@
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #2929c7;
+  font-family: Arial, sans-serif;
+}
+
+.container {
+  background-color: white;
+  border-radius: 20px;
+  padding: 30px;
+  max-width: 500px;
+  width: 90%;
+  margin: 20px;
+  position: relative;
+  padding-top: 10px;
+}
+
+.logo {
+  display: block;
+  margin: 0px auto;
+}
+
+
+.amount {
+  text-align: center;
+  margin: 10px 0 25px 0;
+}
+
+.amount-label {
+  font-size: 18px;
+  color: #333;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.amount-value {
+  color: #58c256;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.tax-box {
+  border: 2px solid #4040ff;
+  border-radius: 25px;
+  padding: 15px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.tax-box-title {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.tax-box-value {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.button {
+  background-color: #4040ff;
+  color: white;
+  border: none;
+  padding: 15px;
+  border-radius: 25px;
+  width: 100%;
+  font-size: 16px;
+  cursor: pointer;
+  margin: 20px 0;
+}
+
+.info-box {
+  background-color: #f5f5f5;
+  padding: 20px;
+  border-radius: 15px;
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+#pixCode {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  margin-bottom: 15px;
+  background-color: white;
+  box-sizing: border-box;
+}
+
+#pixCodeContainer {
+  display: none;
+  margin: 20px 0;
+  padding: 20px;
+  background-color: #f0f2f5;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.pix-header {
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: #e8eaed;
+  border-radius: 5px;
+}
+
+.countdown {
+  color: #ff0000;
+  font-size: 16px;
+  margin: 15px 0;
+  font-weight: bold;
+}
+
+.pix-instructions {
+  font-size: 14px;
+  color: #333;
+  margin: 15px 0;
+  font-weight: bold;
+}
+
+.copy-btn {
+  background-color: #00c853;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  width: 100%;
+  font-weight: bold;
+  text-transform: uppercase;
+  transition: background-color 0.3s;
+}
+
+.copy-btn:hover {
+  background-color: #00b34a;
+}
+
+#loadingMessage {
+  display: none;
+  text-align: center;
+  margin: 20px 0px;
+  font-weight: bold;
+}
+

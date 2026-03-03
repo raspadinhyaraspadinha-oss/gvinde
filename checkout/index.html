@@ -148,6 +148,13 @@
     }
     .sub-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
     .hidden { display: none !important; }
+    .step-panel {
+      animation: fadeInStep 220ms ease-out;
+    }
+    @keyframes fadeInStep {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
     .status {
       margin-top: 8px;
       font-size: 13px;
@@ -256,59 +263,67 @@
         </div>
       </div>
 
-      <div class="section">
-        <h2>Resumo</h2>
-        <div class="grid">
-          <div class="info-box">
-            <div class="label">Nome</div>
-            <div id="nameValue" class="value">-</div>
+      <div id="panelStep1" class="step-panel">
+        <div class="section">
+          <h2>Resumo</h2>
+          <div class="grid">
+            <div class="info-box">
+              <div class="label">Nome</div>
+              <div id="nameValue" class="value">-</div>
+            </div>
+            <div class="info-box">
+              <div class="label">CPF</div>
+              <div id="cpfValue" class="value">-</div>
+            </div>
+            <div class="info-box">
+              <div class="label">Chave PIX</div>
+              <div id="pixKeyValue" class="value">-</div>
+            </div>
+            <div class="info-box">
+              <div class="label">Valor da taxa</div>
+              <div id="feeValue" class="value">R$ 72,90</div>
+            </div>
           </div>
-          <div class="info-box">
-            <div class="label">CPF</div>
-            <div id="cpfValue" class="value">-</div>
+        </div>
+
+        <div class="section">
+          <div class="price-highlight">
+            <div class="small">Total para pagamento</div>
+            <div id="feeBig" class="big">R$ 72,90</div>
           </div>
-          <div class="info-box">
-            <div class="label">Chave PIX</div>
-            <div id="pixKeyValue" class="value">-</div>
+          <div style="margin-top: 10px;">
+            <button id="generateBtn" class="btn">Gerar PIX agora</button>
           </div>
-          <div class="info-box">
-            <div class="label">Valor da taxa</div>
-            <div id="feeValue" class="value">R$ 72,90</div>
-          </div>
+          <div id="mainStatus" class="status hidden"></div>
         </div>
       </div>
 
-      <div class="section">
-        <div class="price-highlight">
-          <div class="small">Total para pagamento</div>
-          <div id="feeBig" class="big">R$ 72,90</div>
-        </div>
-        <div style="margin-top: 10px;">
-          <button id="generateBtn" class="btn">Gerar PIX agora</button>
-        </div>
-        <div id="mainStatus" class="status hidden"></div>
-      </div>
-
-      <div id="pixSection" class="section hidden">
-        <h2>PIX gerado</h2>
-        <div class="qr-box">
-          <div id="qrcode"></div>
-        </div>
-        <div id="copyCode" class="copy-box">Aguardando codigo PIX...</div>
-        <div class="sub-btns">
-          <button id="copyBtn" class="btn ghost">Copiar codigo</button>
-          <button id="verifyBtn" class="btn ghost">Ja paguei - Verificar</button>
-        </div>
-        <div class="trust" style="margin-top: 10px;">
-          Tempo restante aproximado: <b id="expiresLabel">--:--</b>
+      <div id="panelStep2" class="step-panel hidden">
+        <div id="pixSection" class="section">
+          <h2>PIX gerado</h2>
+          <div class="qr-box">
+            <div id="qrcode"></div>
+          </div>
+          <div id="copyCode" class="copy-box">Aguardando codigo PIX...</div>
+          <div class="sub-btns">
+            <button id="copyBtn" class="btn ghost">Copiar codigo</button>
+            <button id="verifyBtn" class="btn ghost">Ja paguei - Verificar</button>
+          </div>
+          <div class="trust" style="margin-top: 10px;">
+            Tempo restante aproximado: <b id="expiresLabel">--:--</b>
+          </div>
+          <div id="pixStatus" class="status hidden"></div>
         </div>
       </div>
 
-      <div id="successSection" class="section hidden">
-        <h2>Pagamento confirmado</h2>
-        <div class="status ok">Recebemos a confirmacao do PIX. Seu fluxo sera liberado agora.</div>
-        <div style="margin-top: 10px;">
-          <button id="continueBtn" class="btn green">Continuar</button>
+      <div id="panelStep3" class="step-panel hidden">
+        <div id="successSection" class="section">
+          <h2>Pagamento confirmado</h2>
+          <div class="status ok">Recebemos a confirmacao do PIX. Seu fluxo sera liberado agora.</div>
+          <div id="successStatus" class="status hidden" style="margin-top: 8px;"></div>
+          <div style="margin-top: 10px;">
+            <button id="continueBtn" class="btn green">Continuar</button>
+          </div>
         </div>
       </div>
     </div>
@@ -319,7 +334,7 @@
     const API_CREATE = "./api/create-payment.php";
     const API_CHECK = "./api/check-payment.php";
     const SESSION_KEY = "checkoutSessionId";
-    const DEFAULT_NEXT_URL = "../index.html";
+    const DEFAULT_NEXT_URL = "../up1/index.html";
     const POLL_INTERVAL_MS = 5000;
     const POLL_MAX_MS = 10 * 60 * 1000;
 
@@ -336,6 +351,7 @@
     let pollTimer = null;
     let pollStartedAt = 0;
     let expiresAtRaw = null;
+    let currentStep = 1;
 
     function parseAmountCents(value) {
       const onlyNums = value.replace(/[^\d,\.]/g, "").replace(/\./g, "").replace(",", ".");
@@ -354,13 +370,18 @@
     }
 
     function setStep(step) {
+      currentStep = step;
       document.getElementById("step1").classList.toggle("active", step === 1);
       document.getElementById("step2").classList.toggle("active", step === 2);
       document.getElementById("step3").classList.toggle("active", step === 3);
+      document.getElementById("panelStep1").classList.toggle("hidden", step !== 1);
+      document.getElementById("panelStep2").classList.toggle("hidden", step !== 2);
+      document.getElementById("panelStep3").classList.toggle("hidden", step !== 3);
     }
 
     function showStatus(text, type = "info") {
-      const el = document.getElementById("mainStatus");
+      const targetId = currentStep === 2 ? "pixStatus" : (currentStep === 3 ? "successStatus" : "mainStatus");
+      const el = document.getElementById(targetId);
       el.classList.remove("hidden", "ok", "error");
       if (type === "ok") el.classList.add("ok");
       if (type === "error") el.classList.add("error");
@@ -368,7 +389,10 @@
     }
 
     function hideStatus() {
-      document.getElementById("mainStatus").classList.add("hidden");
+      ["mainStatus", "pixStatus", "successStatus"].forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add("hidden");
+      });
     }
 
     function buildCustomerContact() {
@@ -426,7 +450,6 @@
 
         renderQR(data.pix_qrcode_text);
         document.getElementById("copyCode").textContent = data.pix_qrcode_text;
-        document.getElementById("pixSection").classList.remove("hidden");
         setStep(2);
         showStatus("PIX gerado com sucesso. Realize o pagamento para continuar.", "ok");
 
@@ -473,7 +496,6 @@
 
     function onPaid() {
       setStep(3);
-      document.getElementById("successSection").classList.remove("hidden");
       showStatus("Pagamento aprovado! Liberando proxima etapa...", "ok");
       stopPolling();
       setTimeout(() => {
@@ -554,10 +576,11 @@
 
       // If session exists, resume polling
       if (sessionId) {
-        document.getElementById("pixSection").classList.remove("hidden");
         setStep(2);
         showStatus("Retomamos sua sessao de pagamento. Verificando status...", "info");
         startPolling();
+      } else {
+        setStep(1);
       }
 
       setInterval(updateExpireLabel, 1000);
