@@ -57,6 +57,9 @@ $allowed_referrers = [
     'm.kwai.com',
     'google.com',
     'google.com.br',
+    // Seu funil / páginas do seu site (clique interno)
+    'online.sbs',
+    'consulte--online.sbs',
 ];
 
 // ============================================================
