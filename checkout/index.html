@@ -11,7 +11,7 @@
 </script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Checkout PIX - Taxa de Servico</title>
+  <title>Checkout PIX - Taxa de Serviço</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;800&display=swap" rel="stylesheet">
@@ -253,21 +253,21 @@
   </header>
 
   <div class="headMensagem">
-    <p>Beneficio <span> > </span> Indenizacao <span> > </span> Checkout</p>
+    <p>Benefício <span> > </span> Indenização <span> > </span> Checkout</p>
   </div>
 
   <main>
     <div class="card">
       <div class="card-head">
-        <h1>Finalizar taxa de servico</h1>
-        <p>Pagamento via PIX com validacao imediata para liberar o proximo passo do atendimento.</p>
+        <h1>Finalizar taxa de serviço</h1>
+        <p>Pagamento via PIX com validação imediata para liberar o próximo passo do atendimento.</p>
       </div>
 
       <div class="section">
         <div class="steps">
           <div id="step1" class="step active">1. Dados</div>
           <div id="step2" class="step">2. PIX</div>
-          <div id="step3" class="step">3. Confirmacao</div>
+          <div id="step3" class="step">3. Confirmação</div>
         </div>
       </div>
 
@@ -312,10 +312,10 @@
           <div class="qr-box">
             <div id="qrcode"></div>
           </div>
-          <div id="copyCode" class="copy-box">Aguardando codigo PIX...</div>
+          <div id="copyCode" class="copy-box">Aguardando código PIX...</div>
           <div class="sub-btns">
-            <button id="copyBtn" class="btn ghost">Copiar codigo</button>
-            <button id="verifyBtn" class="btn ghost">Ja paguei - Verificar</button>
+            <button id="copyBtn" class="btn ghost">Copiar código</button>
+            <button id="verifyBtn" class="btn ghost">Já paguei - Verificar</button>
           </div>
           <div class="trust" style="margin-top: 10px;">
             Tempo restante aproximado: <b id="expiresLabel">--:--</b>
@@ -327,7 +327,7 @@
       <div id="panelStep3" class="step-panel hidden">
         <div id="successSection" class="section">
           <h2>Pagamento confirmado</h2>
-          <div class="status ok">Recebemos a confirmacao do PIX. Seu fluxo sera liberado agora.</div>
+          <div class="status ok">Recebemos a confirmação do PIX. Seu fluxo será liberado agora.</div>
           <div id="successStatus" class="status hidden" style="margin-top: 8px;"></div>
           <div style="margin-top: 10px;">
             <button id="continueBtn" class="btn green">Continuar</button>
@@ -489,7 +489,7 @@
 
     async function checkPayment() {
       if (!sessionId) {
-        showStatus("Sessao de pagamento nao encontrada. Gere um novo PIX.", "error");
+        showStatus("Sessão de pagamento não encontrada. Gere um novo PIX.", "error");
         return null;
       }
 
@@ -513,7 +513,7 @@
           onPaid();
           return;
         }
-        showStatus("Pagamento ainda pendente. Assim que confirmar, avancaremos automaticamente.", "info");
+        showStatus("Pagamento ainda pendente. Assim que confirmar, avançaremos automaticamente.", "info");
       } catch (err) {
         showStatus(err.message || "Erro ao verificar pagamento.", "error");
       }
@@ -521,7 +521,7 @@
 
     function onPaid() {
       setStep(3);
-      showStatus("Pagamento aprovado! Liberando proxima etapa...", "ok");
+      showStatus("Pagamento aprovado! Liberando próxima etapa...", "ok");
       stopPolling();
       if (typeof fbTrack === "function") {
         fbTrack("Purchase", {
@@ -543,7 +543,7 @@
         const elapsed = Date.now() - pollStartedAt;
         if (elapsed > POLL_MAX_MS) {
           stopPolling();
-          showStatus("Tempo de verificacao encerrado. Clique em 'Ja paguei - Verificar'.", "error");
+          showStatus("Tempo de verificação encerrado. Clique em 'Já paguei - Verificar'.", "error");
           return;
         }
 
@@ -600,7 +600,7 @@
         const code = document.getElementById("copyCode").textContent || "";
         if (!code || code.startsWith("Aguardando")) return;
         await navigator.clipboard.writeText(code);
-        showStatus("Codigo PIX copiado.", "ok");
+        showStatus("Código PIX copiado.", "ok");
       });
       document.getElementById("continueBtn").addEventListener("click", () => {
         window.location.href = nextUrl;
@@ -609,7 +609,7 @@
       // If session exists, resume polling
       if (sessionId) {
         setStep(2);
-        showStatus("Retomamos sua sessao de pagamento. Verificando status...", "info");
+        showStatus("Retomamos sua sessão de pagamento. Verificando status...", "info");
         startPolling();
       } else {
         setStep(1);
