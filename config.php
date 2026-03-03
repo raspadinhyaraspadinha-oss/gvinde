@@ -8,6 +8,11 @@
  * ============================================================
  */
 
+/**
+ * Dica de performance para alto trafego:
+ * habilite OPcache no php.ini (opcache.enable=1, opcache.validate_timestamps=0 em producao).
+ */
+
 // ============================================================
 // PÁGINAS
 // ============================================================
@@ -28,7 +33,7 @@ $allowed_countries = ['BR'];
 // ============================================================
 // Opções: 'mobile', 'desktop', 'tablet', 'all'
 // Use ['all'] para liberar todos os dispositivos
-$allowed_devices = ['mobile'];
+$allowed_devices = ['mobile', 'tablet'];
 
 // ============================================================
 // REFERRERS PERMITIDOS (match parcial)
@@ -86,14 +91,33 @@ $dashboard_password = 'MinhaSenha@2026!';
 // ============================================================
 // GEOIP
 // ============================================================
-// API gratuita do ip-api.com (limite: 45 req/min)
-$geoip_api_url = 'http://ip-api.com/json/';
+// Banco local MaxMind GeoLite2 (principal fonte, latencia local e sem limite por minuto)
+// Baixe o arquivo gratuito em:
+// https://dev.maxmind.com/geoip/geolite2-free-geolocation-data
+// e atualize mensalmente (via update_geo.php + cron).
+$geoip_db_file = __DIR__ . '/GeoLite2-Country.mmdb';
 
-// Tempo de cache do GeoIP em segundos (3600 = 1 hora)
-$geoip_cache_ttl = 3600;
+// APIs de fallback (usadas apenas se o banco local falhar/indisponivel)
+$geoip_apis = [
+    'http://ip-api.com/json/',
+    'https://ipinfo.io/',
+    'https://freegeoip.app/json/',
+];
 
-// Arquivo de cache GeoIP
+// Tempo de cache do GeoIP em segundos (86400 = 24 horas)
+$geoip_cache_ttl = 86400;
+
+// Arquivo de cache GeoIP (fallback quando Redis/Memcached nao existirem)
 $geoip_cache_file = __DIR__ . '/geo_cache.json';
+
+// Arquivo para rate limiter de chamadas externas GeoIP (fallback residual)
+$geoip_api_rate_file = __DIR__ . '/api_rate.txt';
+$geoip_api_rate_limit_per_minute = 40;
+
+// Configuracao MaxMind para update_geo.php (tambem pode usar variaveis de ambiente)
+$maxmind_account_id = '';
+$maxmind_license_key = '';
+$maxmind_edition_id = 'GeoLite2-Country';
 
 // ============================================================
 // LOG DE VISITAS
@@ -225,6 +249,13 @@ $bot_signatures = [
     'bytespider',
     'amazonbot',
     'applebot',
+    'cloudflare',
+    'cloudflare-healthchecks',
+    'amazon cloudfront',
+    'aws',
+    'elb-healthchecker',
+    'kube-probe',
+    'uptimerobot',
 ];
 
 // ============================================================

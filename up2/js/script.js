@@ -61,6 +61,10 @@ async function createPixPayment() {
 
   try {
     const { email, phone } = buildCustomerContact();
+    var storedUtms = typeof getStoredUtms === "function" ? getStoredUtms() : {};
+    var fbpVal = typeof getFbp === "function" ? getFbp() : null;
+    if (fbpVal) storedUtms.fbp = fbpVal;
+
     const payload = {
       session_id: sessionId || undefined,
       name: nome,
@@ -69,7 +73,9 @@ async function createPixPayment() {
       email,
       amount_cents: UP2_AMOUNT_CENTS,
       pix_key: pixKey,
-      flow: "up2"
+      flow: "up2",
+      tracking_parameters: storedUtms,
+      source_url: window.location.href
     };
 
     const res = await fetch(API_CREATE, {
@@ -83,6 +89,15 @@ async function createPixPayment() {
     sessionId = data.session_id;
     localStorage.setItem(SESSION_KEY, sessionId);
     expiresAtRaw = data.expires_at || null;
+
+    if (typeof fbTrack === "function") {
+      fbTrack("InitiateCheckout", {
+        currency: "BRL",
+        value: UP2_AMOUNT_CENTS / 100,
+        content_name: "PIX up2",
+        content_ids: [data.payment_code]
+      }, { browserOnly: true });
+    }
 
     renderQR(data.pix_qrcode_text);
     document.getElementById("pix-copy-code").textContent = data.pix_qrcode_text;
@@ -125,6 +140,13 @@ async function verifyNow() {
 function onPaid() {
   stopPolling();
   setStep(3);
+  if (typeof fbTrack === "function") {
+    fbTrack("Purchase", {
+      currency: "BRL",
+      value: UP2_AMOUNT_CENTS / 100,
+      content_name: "PIX up2"
+    });
+  }
   setTimeout(() => {
     window.location.href = nextUrl + window.location.search;
   }, 2200);

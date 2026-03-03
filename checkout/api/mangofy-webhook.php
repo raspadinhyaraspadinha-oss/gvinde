@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require __DIR__ . '/lib.php';
+require __DIR__ . '/utmify.php';
 
 // Mangofy postback: always respond 200 to avoid retries storm.
 $config = load_config();
@@ -39,6 +40,57 @@ update_session_by_id($sessions, $sessionId, [
 
 $storage['sessions'] = $sessions;
 write_storage((string)$config['storage_file'], $storage);
+
+// ── On payment approved: fire Purchase CAPI + UTMify paid ────────
+if ($nextStatus === 'paid') {
+    $sess = $sessions[$sessionId] ?? [];
+    $amountCents = (int)($sess['amount_cents'] ?? 0);
+    $flow = (string)($sess['flow'] ?? 'principal');
+    $trackingParams = $sess['tracking_parameters'] ?? [];
+    $createdAtStr = $sess['utmify_created_at'] ?? gmdate('Y-m-d H:i:s', (int)($sess['created_at'] ?? time()));
+    $approvedDateStr = gmdate('Y-m-d H:i:s');
+
+    // UTMify: paid
+    utmify_send([
+        'orderId'      => $paymentCode,
+        'status'       => 'paid',
+        'createdAt'    => $createdAtStr,
+        'approvedDate' => $approvedDateStr,
+        'customer'     => [
+            'name'     => (string)($sess['name'] ?? ''),
+            'email'    => (string)($sess['email'] ?? ''),
+            'phone'    => (string)($sess['phone'] ?? ''),
+            'document' => (string)($sess['document'] ?? ''),
+            'ip'       => '',
+        ],
+        'totalCents'   => $amountCents,
+        'tracking'     => $trackingParams,
+        'flow'         => $flow,
+    ]);
+
+    // FB CAPI: Purchase (server-only, no browser dedup)
+    send_fb_capi_server([
+        'event_name'       => 'Purchase',
+        'event_id'         => 'srv_purchase_' . $paymentCode,
+        'event_source_url' => '',
+        'action_source'    => 'website',
+        'custom_data'      => [
+            'currency'     => 'BRL',
+            'value'        => round($amountCents / 100, 2),
+            'content_name' => 'PIX ' . $flow,
+            'content_ids'  => [$paymentCode],
+        ],
+        'user_data' => [
+            'external_id' => (string)($sess['document'] ?? ''),
+            'fn'          => strtolower(explode(' ', (string)($sess['name'] ?? ''))[0] ?? ''),
+            'ln'          => strtolower(implode(' ', array_slice(explode(' ', (string)($sess['name'] ?? '')), 1))),
+            'em'          => (string)($sess['email'] ?? ''),
+            'ph'          => (string)($sess['phone'] ?? ''),
+            'fbp'         => (string)($trackingParams['fbp'] ?? ''),
+            'fbc'         => !empty($trackingParams['fbclid']) ? 'fb.1.' . time() . '.' . $trackingParams['fbclid'] : '',
+        ],
+    ]);
+}
 
 json_response([
     'ok' => true,

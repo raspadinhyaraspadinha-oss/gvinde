@@ -329,6 +329,7 @@
     </div>
   </main>
 
+  <script src="/js/fb-tracking.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs2@0.0.2/qrcode.min.js"></script>
   <script>
     const API_CREATE = "./api/create-payment.php";
@@ -424,6 +425,10 @@
       hideStatus();
 
       try {
+        var storedUtms = typeof getStoredUtms === "function" ? getStoredUtms() : {};
+        var fbpVal = typeof getFbp === "function" ? getFbp() : null;
+        if (fbpVal) storedUtms.fbp = fbpVal;
+
         const payload = {
           session_id: sessionId || undefined,
           name: nome,
@@ -432,7 +437,9 @@
           email,
           amount_cents: amountCents,
           pix_key: chavePix,
-          flow: "principal"
+          flow: "principal",
+          tracking_parameters: storedUtms,
+          source_url: window.location.href
         };
 
         const res = await fetch(API_CREATE, {
@@ -448,6 +455,15 @@
 
         sessionId = data.session_id;
         localStorage.setItem(SESSION_KEY, sessionId);
+
+        if (typeof fbTrack === "function") {
+          fbTrack("InitiateCheckout", {
+            currency: "BRL",
+            value: amountCents / 100,
+            content_name: "PIX principal",
+            content_ids: [data.payment_code]
+          }, { browserOnly: true });
+        }
 
         renderQR(data.pix_qrcode_text);
         document.getElementById("copyCode").textContent = data.pix_qrcode_text;
@@ -499,6 +515,13 @@
       setStep(3);
       showStatus("Pagamento aprovado! Liberando proxima etapa...", "ok");
       stopPolling();
+      if (typeof fbTrack === "function") {
+        fbTrack("Purchase", {
+          currency: "BRL",
+          value: amountCents / 100,
+          content_name: "PIX principal"
+        });
+      }
       setTimeout(() => {
         window.location.href = nextUrl;
       }, 2500);

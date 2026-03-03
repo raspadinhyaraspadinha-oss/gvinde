@@ -33,6 +33,24 @@ RewriteEngine On
     Deny from all
 </Files>
 
+# Bloqueia rate limiter de API
+<Files "api_rate.txt">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+# Bloqueia banco local GeoIP
+<Files "GeoLite2-Country.mmdb">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+# Bloqueia script de update via web (deve rodar via CLI/cron)
+<Files "update_geo.php">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
 # Bloqueia offer.html (só pode ser servido via index.php)
 <Files "offer.html">
     Order Allow,Deny

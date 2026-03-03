@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require __DIR__ . '/lib.php';
+require __DIR__ . '/utmify.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     json_response(['ok' => false, 'error' => 'Metodo nao permitido'], 405);
@@ -152,6 +153,60 @@ update_session_by_id($sessions, $sessionId, [
     'last_mangofy_response' => $decoded,
 ]);
 
+$storage['sessions'] = $sessions;
+write_storage((string)$config['storage_file'], $storage);
+
+// ── UTMify: waiting_payment ──────────────────────────────────────
+$trackingParams = $payload['tracking_parameters'] ?? [];
+$createdAtStr = gmdate('Y-m-d H:i:s');
+
+$utmifyResult = utmify_send([
+    'orderId'      => $paymentCode,
+    'status'       => 'waiting_payment',
+    'createdAt'    => $createdAtStr,
+    'approvedDate' => null,
+    'customer'     => [
+        'name'     => $name,
+        'email'    => $email,
+        'phone'    => $phone,
+        'document' => $document,
+        'ip'       => $ip,
+    ],
+    'totalCents'   => $amountCents,
+    'tracking'     => $trackingParams,
+    'flow'         => $flow,
+]);
+
+// ── FB CAPI: InitiateCheckout (server-side, no browser dedup needed) ─
+$fbCapiPayload = [
+    'event_name'       => 'InitiateCheckout',
+    'event_id'         => 'srv_ic_' . $paymentCode,
+    'event_source_url' => (string)($payload['source_url'] ?? ''),
+    'action_source'    => 'website',
+    'custom_data'      => [
+        'currency' => 'BRL',
+        'value'    => round($amountCents / 100, 2),
+        'content_name' => 'PIX ' . $flow,
+        'content_ids'  => [$paymentCode],
+    ],
+    'user_data' => [
+        'client_ip_address' => $ip,
+        'external_id'       => $document,
+        'fn'                => strtolower(explode(' ', $name)[0] ?? ''),
+        'ln'                => strtolower(implode(' ', array_slice(explode(' ', $name), 1))),
+        'em'                => $email,
+        'ph'                => $phone,
+        'fbp'               => (string)($trackingParams['fbp'] ?? ''),
+        'fbc'               => !empty($trackingParams['fbclid']) ? 'fb.1.' . time() . '.' . $trackingParams['fbclid'] : '',
+    ],
+];
+send_fb_capi_server($fbCapiPayload);
+
+// Persist createdAt for UTMify paid event later
+update_session_by_id($sessions, $sessionId, [
+    'utmify_created_at' => $createdAtStr,
+    'tracking_parameters' => $trackingParams,
+]);
 $storage['sessions'] = $sessions;
 write_storage((string)$config['storage_file'], $storage);
 

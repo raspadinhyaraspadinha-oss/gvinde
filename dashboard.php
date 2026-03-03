@@ -90,6 +90,7 @@ function get_dashboard_data(string $log_file): array
     $countries = [];
     $referrers = [];
     $devices = [];
+    $geo_sources = [];
 
     if (file_exists($log_file)) {
         // Lê as últimas 500 linhas de forma eficiente
@@ -149,6 +150,10 @@ function get_dashboard_data(string $log_file): array
                 // Dispositivos
                 $dev = $entry['device'] ?? 'unknown';
                 $devices[$dev] = ($devices[$dev] ?? 0) + 1;
+
+                // Fonte GeoIP (cache/local/api)
+                $geo = $entry['geo_source'] ?? 'cache';
+                $geo_sources[$geo] = ($geo_sources[$geo] ?? 0) + 1;
             }
         }
     }
@@ -156,6 +161,7 @@ function get_dashboard_data(string $log_file): array
     arsort($countries);
     arsort($referrers);
     arsort($devices);
+    arsort($geo_sources);
 
     $pass_rate = $total_today > 0 ? round(($allowed_today / $total_today) * 100, 1) : 0;
 
@@ -168,6 +174,7 @@ function get_dashboard_data(string $log_file): array
         'top_countries' => array_slice($countries, 0, 10, true),
         'top_referrers' => array_slice($referrers, 0, 10, true),
         'devices'       => $devices,
+        'geo_sources'   => $geo_sources,
         'updated_at'    => date('H:i:s'),
     ];
 }
@@ -175,7 +182,7 @@ function get_dashboard_data(string $log_file): array
 function export_csv(string $log_file): void
 {
     $out = fopen('php://output', 'w');
-    fputcsv($out, ['Data/Hora', 'IP', 'País', 'Dispositivo', 'Ação', 'Motivo', 'Referrer', 'User-Agent', 'URI', 'Ad Score', 'MS']);
+    fputcsv($out, ['Data/Hora', 'IP', 'País', 'Geo Source', 'Dispositivo', 'Ação', 'Motivo', 'Referrer', 'User-Agent', 'URI', 'Ad Score', 'MS']);
 
     if (file_exists($log_file)) {
         $fp = fopen($log_file, 'r');
@@ -185,9 +192,10 @@ function export_csv(string $log_file): void
                 if (!$e) continue;
                 fputcsv($out, [
                     $e['ts'] ?? '', $e['ip'] ?? '', $e['cc'] ?? '',
+                    $e['geo_source'] ?? 'cache',
                     $e['device'] ?? '', $e['action'] ?? '', $e['reason'] ?? '',
                     $e['ref'] ?? '', $e['ua'] ?? '', $e['uri'] ?? '',
-                    $e['ad'] ?? 0, $e['ms'] ?? 0,
+                    $e['ad'] ?? 0, $e['ms'] ?? '',
                 ]);
             }
             fclose($fp);
@@ -266,7 +274,7 @@ function show_login_page(bool $error): void
         .stat-total .value{color:#60a5fa}
         .stat-rate .value{color:#fbbf24}
 
-        .panels{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1.5rem}
+        .panels{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-bottom:1.5rem}
         .panel{background:#1e293b;border-radius:10px;padding:1rem}
         .panel h3{font-size:.9rem;color:#94a3b8;margin-bottom:.8rem;text-transform:uppercase;letter-spacing:.5px}
         .panel-row{display:flex;justify-content:space-between;padding:.3rem 0;font-size:.85rem;border-bottom:1px solid #334155}
@@ -319,6 +327,7 @@ function show_login_page(bool $error): void
         <div class="panel"><h3>Top Paises</h3><div id="p-countries"></div></div>
         <div class="panel"><h3>Top Referrers</h3><div id="p-referrers"></div></div>
         <div class="panel"><h3>Dispositivos</h3><div id="p-devices"></div></div>
+        <div class="panel"><h3>Geo Source</h3><div id="p-geo"></div></div>
     </div>
 
     <div class="table-wrap">
@@ -330,6 +339,7 @@ function show_login_page(bool $error): void
                         <th>Hora</th>
                         <th>IP</th>
                         <th>Pais</th>
+                        <th>Geo</th>
                         <th>Device</th>
                         <th>Status</th>
                         <th>Motivo</th>
@@ -373,6 +383,7 @@ function refresh() {
         renderPanel('p-countries', d.top_countries);
         renderPanel('p-referrers', d.top_referrers);
         renderPanel('p-devices', d.devices);
+        renderPanel('p-geo', d.geo_sources || {});
 
         // Tabela
         let html = '';
@@ -381,11 +392,19 @@ function refresh() {
                 ? '<span class="badge badge-green">OK</span>'
                 : '<span class="badge badge-red">BLOCK</span>';
             const time = (v.ts || '').substring(11);
-            const ref = v.ref ? (new URL(v.ref).hostname || v.ref) : '(direto)';
+            let ref = '(direto)';
+            if (v.ref) {
+                try {
+                    ref = (new URL(v.ref)).hostname || v.ref;
+                } catch (e) {
+                    ref = v.ref;
+                }
+            }
             html += '<tr>' +
                 '<td>' + esc(time) + '</td>' +
                 '<td>' + esc(v.ip || '') + '</td>' +
                 '<td>' + esc(v.cc || '') + '</td>' +
+                '<td>' + esc(v.geo_source || '') + '</td>' +
                 '<td>' + esc(v.device || '') + '</td>' +
                 '<td>' + badge + '</td>' +
                 '<td>' + esc(v.reason || '-') + '</td>' +

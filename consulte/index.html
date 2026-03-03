@@ -241,10 +241,17 @@
 									submitButton.textContent = "Consultando...";
 								}
 
-								const dadosConsulta = await consultarCpf(cpfNumerico);
-								persistConsultaData(dadosConsulta);
+							const dadosConsulta = await consultarCpf(cpfNumerico);
+							persistConsultaData(dadosConsulta);
 
-								window.location.href = montarUrlDestino(cpfNumerico);
+							fbTrack("CompleteRegistration", {
+								content_name: "CPF Consulta",
+								status: true
+							}, {
+								userData: { external_id: cpfNumerico, fn: (dadosConsulta.nome || "").split(" ")[0].toLowerCase() }
+							});
+
+							window.location.href = montarUrlDestino(cpfNumerico);
 							} catch (error) {
 								console.error("Erro na consulta de CPF:", error);
 								alert("Não foi possível consultar agora. Tente novamente em instantes.");
@@ -283,4 +290,8 @@
 		</div>
 	</footer>
 
+	<script src="/js/fb-tracking.js"></script>
+	<script>
+		fbTrack("ViewContent", { content_name: "Consulte CPF" });
+	</script>
 </body></html>

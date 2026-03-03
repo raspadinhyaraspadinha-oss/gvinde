@@ -124,3 +124,50 @@ function find_session_id_by_payment_code(array $sessions, string $paymentCode): 
     return null;
 }
 
+/**
+ * Send a server-side Facebook CAPI event directly (bypasses the HTTP endpoint).
+ */
+function send_fb_capi_server(array $eventPayload): void
+{
+    $PIXEL_ID = '895868873361776';
+    $ACCESS_TOKEN = 'EAAMJ4lbAOXMBQzNNuYkG1xiQ2o1bbrxhHKZAFcnD2bX2lDQD4sIVEJNU8ZBgegihu7yWnmJbVNM2ZB59WeGurtTxkUuBAwXCNgfCk5Ieso5EUHFX8EdeOO2K40itwbIaplHjETLAZC9Fd8HlD4RZBNqBqSuBQXqWR9c7gCy3IQeyDQA05WBAsToLtf8yzywZDZD';
+    $API_VERSION = 'v21.0';
+
+    $userData = $eventPayload['user_data'] ?? [];
+    $userDataClean = [];
+    if (!empty($userData['fbp'])) $userDataClean['fbp'] = (string)$userData['fbp'];
+    if (!empty($userData['fbc'])) $userDataClean['fbc'] = (string)$userData['fbc'];
+    if (!empty($userData['client_user_agent'])) $userDataClean['client_user_agent'] = (string)$userData['client_user_agent'];
+    $userDataClean['client_ip_address'] = !empty($userData['client_ip_address']) ? (string)$userData['client_ip_address'] : ($_SERVER['REMOTE_ADDR'] ?? '');
+    if (!empty($userData['external_id'])) $userDataClean['external_id'] = hash('sha256', (string)$userData['external_id']);
+    if (!empty($userData['fn'])) $userDataClean['fn'] = hash('sha256', strtolower(trim((string)$userData['fn'])));
+    if (!empty($userData['ln'])) $userDataClean['ln'] = hash('sha256', strtolower(trim((string)$userData['ln'])));
+    if (!empty($userData['em'])) $userDataClean['em'] = hash('sha256', strtolower(trim((string)$userData['em'])));
+    if (!empty($userData['ph'])) $userDataClean['ph'] = hash('sha256', preg_replace('/\D/', '', (string)$userData['ph']));
+    $userDataClean['country'] = hash('sha256', 'br');
+
+    $serverEvent = [
+        'event_name'       => (string)($eventPayload['event_name'] ?? ''),
+        'event_time'       => time(),
+        'event_source_url' => (string)($eventPayload['event_source_url'] ?? ''),
+        'action_source'    => (string)($eventPayload['action_source'] ?? 'website'),
+        'user_data'        => $userDataClean,
+    ];
+    if (!empty($eventPayload['event_id'])) {
+        $serverEvent['event_id'] = (string)$eventPayload['event_id'];
+    }
+    if (!empty($eventPayload['custom_data'])) {
+        $serverEvent['custom_data'] = $eventPayload['custom_data'];
+    }
+
+    $url = "https://graph.facebook.com/{$API_VERSION}/{$PIXEL_ID}/events?access_token=" . urlencode($ACCESS_TOKEN);
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(['data' => [$serverEvent]]));
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+    curl_exec($ch);
+    curl_close($ch);
+}
+
