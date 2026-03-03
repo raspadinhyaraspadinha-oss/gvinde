@@ -156,6 +156,8 @@
       if (sessionId) {
         document.getElementById("up5PixBox").classList.add("show");
         showStatus("Você já tem um PIX ativo para esta etapa. Use o mesmo código ou clique em 'Já paguei - Verificar'.", "error");
+        startPolling();
+        if (btn) btn.disabled = false;
         return;
       }
 
@@ -260,11 +262,6 @@
       }).catch(function() { showStatus("Erro ao verificar.", "error"); });
     });
 
-    if (sessionId) {
-      document.getElementById("up5PixBox").classList.add("show");
-      showStatus("Sessão restaurada. Verificando pagamento...", "");
-      startPolling();
-    }
     setInterval(updateTimer, 1000);
     updateTimer();
   </script>

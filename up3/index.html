@@ -550,6 +550,7 @@ window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/15
       const area = document.getElementById("up3PixArea");
       if (area) area.classList.add("open");
       up3ShowStatus("Você já tem um PIX ativo para esta etapa. Use o mesmo código ou clique em 'Já paguei - Verificar'.", "error");
+      up3StartPolling();
       return;
     }
     btn.disabled = true;
@@ -724,13 +725,6 @@ window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/15
 
     if (verifyBtn) {
       verifyBtn.addEventListener("click", up3VerifyNow);
-    }
-
-    if (up3SessionId) {
-      const area = document.getElementById("up3PixArea");
-      if (area) area.style.display = "block";
-      up3ShowStatus("Retomamos sua sessão PIX. Verificando pagamento...", "info");
-      up3StartPolling();
     }
 
     setInterval(up3UpdateTimer, 1000);
