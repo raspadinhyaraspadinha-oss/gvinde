@@ -4,8 +4,8 @@ declare(strict_types=1);
 return [
     // Mangofy credentials
     'mangofy_api_url' => 'https://checkout.mangofy.com.br/api/v1',
-    'mangofy_authorization' => 'COLE_SEU_TOKEN_AQUI',
-    'mangofy_store_code' => 'COLE_SEU_STORE_CODE_AQUI',
+    'mangofy_authorization' => '2d7ec7be4856d113b6dea617d389cb711dlhqysglpgl6h8tiy3jd5lzc6tx2ei',
+    'mangofy_store_code' => '0d4e1ba5d97eba0bb822b05fae41df4b',
 
     // Postback URL. Prefer setting the final production URL.
     // If left empty, the API builds a URL based on current host.
