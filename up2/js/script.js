@@ -1,126 +1,201 @@
-function createTransaction() {
-  const name = 'Milena Camila Emanuelly';
-  const documentNumber = '88170663385';
-  const phone = '86929768706';
-  const email = 'andreacarolinanovaes@gmail.com';
+const API_CREATE = "../checkout/api/create-payment.php";
+const API_CHECK = "../checkout/api/check-payment.php";
+const SESSION_KEY = "up2CheckoutSessionId";
+const POLL_INTERVAL_MS = 5000;
+const POLL_MAX_MS = 10 * 60 * 1000;
+const DEFAULT_NEXT_URL = "../index.html";
+const UP2_AMOUNT_CENTS = 3582;
 
-  const apiKey = 'sk_live_OxjuJmXzd6SEVlImMdB5pkNxka9gXGJUtHdhG4cWsb';
-  const apiSecret = 'x';
+const params = new URLSearchParams(window.location.search);
+const nome = (params.get("nome") || "Cliente").trim();
+const cpf = (params.get("cpf") || "").replace(/\D/g, "");
+const pixKey = (params.get("chave_pix") || params.get("cpf") || cpf).trim();
+const nextUrl = (params.get("next_up2") || params.get("next") || DEFAULT_NEXT_URL).trim();
+const leadPhone = (params.get("phone") || params.get("telefone") || "").replace(/\D/g, "");
 
-  const authToken = btoa(`${apiKey}:${apiSecret}`);
+let sessionId = localStorage.getItem(SESSION_KEY) || "";
+let pollTimer = null;
+let pollStartedAt = 0;
+let expiresAtRaw = null;
 
-  const url = 'https://api.dashboard.orbitapay.com.br/v1/transactions';
+function setStep(step) {
+  document.getElementById("chip1").classList.toggle("active", step === 1);
+  document.getElementById("chip2").classList.toggle("active", step === 2);
+  document.getElementById("chip3").classList.toggle("active", step === 3);
+  document.getElementById("step1").classList.toggle("hidden", step !== 1);
+  document.getElementById("step2").classList.toggle("hidden", step !== 2);
+  document.getElementById("step3").classList.toggle("hidden", step !== 3);
+}
 
-  const data = {
-      "customer": {
-          "name": name,
-          "email": email,
-          "phone": phone,
-          "document": {
-              "number": documentNumber,
-              "type": "cpf"
-          }
-      },
-      "paymentMethod": "pix",
-      "amount": 3582,
-      "postbackUrl": "https://pagamento.com",
-      "traceable": true,
-      "items": [
-          {
-              "unitPrice": 3582,
-              "title": "Pagamento upsell",
-              "quantity": 1,
-              "tangible": true
-          }
-      ],
-      "address": {
-          "cep": "68907301",
-          "complement": "Pantanal",
-          "number": "304",
-          "street": "Avenida Caubi Sérgio Melo",
-          "district": "Pantanal",
-          "city": "Macapá",
-          "state": "AP"
-      },
-      "utmQuery": "string",
-      "checkoutUrl": "string",
-      "referrerUrl": "pagamento/upsell",
-      "externalId": "string",
-      "traceable": true
-  };
+function showStatus(id, text, type = "info") {
+  const el = document.getElementById(id);
+  el.classList.remove("hidden", "ok", "error");
+  if (type === "ok") el.classList.add("ok");
+  if (type === "error") el.classList.add("error");
+  el.textContent = text;
+}
 
-  // Oculta o botão de pagamento
-  document.getElementById('paymentButton').style.display = 'none';
+function buildCustomerContact() {
+  const normalizedCPF = cpf || "cliente";
+  const email = `${normalizedCPF}@email.com`.replace(/[^\w@.\-]/g, "");
+  const phone = leadPhone.length >= 10 ? leadPhone : "11999999999";
+  return { email, phone };
+}
 
-  // Exibe a mensagem de carregamento
-  document.getElementById('loadingMessage').style.display = 'block';
-
-  fetch(url, {
-      method: 'POST',
-      headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'Authorization': `Basic ${authToken}`
-      },
-      body: JSON.stringify(data),
-  })
-  .then(response => response.json())
-  .then(responseData => {
-      console.log(responseData.pix.qrcode);
-      if (responseData.pix && responseData.pix.qrcode) {
-          const pixCodeInput = document.getElementById('pixCode');
-          pixCodeInput.value = responseData.pix.qrcode;
-
-          // Oculta a mensagem de carregamento
-          document.getElementById('loadingMessage').style.display = 'none';
-
-          // Exibe o container do código PIX
-          document.getElementById('pixCodeContainer').style.display = 'block';
-
-          // Inicia a contagem regressiva
-          startCountdown();
-      } else {
-          throw new Error('Erro ao gerar o código PIX.');
-      }
-  })
-  .catch(error => {
-      console.error('Erro:', error);
-      alert('Erro ao gerar o código PIX.');
-      // Oculta a mensagem de carregamento em caso de erro
-      document.getElementById('loadingMessage').style.display = 'none';
-      // Exibe novamente o botão de pagamento em caso de erro
-      document.getElementById('paymentButton').style.display = 'block';
+function renderQR(pixCode) {
+  const qrEl = document.getElementById("qrcode");
+  qrEl.innerHTML = "";
+  new QRCode(qrEl, {
+    text: pixCode,
+    width: 220,
+    height: 220,
+    correctLevel: QRCode.CorrectLevel.M
   });
 }
 
-function copyPixCode() {
-  const pixCodeInput = document.getElementById('pixCode');
-  const copyButton = document.querySelector('.copy-btn');
-  pixCodeInput.select();
-  pixCodeInput.setSelectionRange(0, 99999);
-  document.execCommand('copy');
-  copyButton.textContent = 'CÓDIGO COPIADO';
-  setTimeout(() => {
-      copyButton.textContent = 'COPIAR CÓDIGO';
-  }, 2000);
+async function createPixPayment() {
+  const button = document.getElementById("paymentButton");
+  const loading = document.getElementById("loadingMessage");
+  button.disabled = true;
+  loading.style.display = "block";
+
+  try {
+    const { email, phone } = buildCustomerContact();
+    const payload = {
+      session_id: sessionId || undefined,
+      name: nome,
+      document: cpf,
+      phone,
+      email,
+      amount_cents: UP2_AMOUNT_CENTS,
+      pix_key: pixKey,
+      flow: "up2"
+    };
+
+    const res = await fetch(API_CREATE, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (!res.ok || !data.ok) throw new Error(data.error || "Falha ao gerar PIX.");
+
+    sessionId = data.session_id;
+    localStorage.setItem(SESSION_KEY, sessionId);
+    expiresAtRaw = data.expires_at || null;
+
+    renderQR(data.pix_qrcode_text);
+    document.getElementById("pix-copy-code").textContent = data.pix_qrcode_text;
+    setStep(2);
+    showStatus("step2Status", "PIX gerado com sucesso. Realize o pagamento para continuar.", "ok");
+    startPolling();
+  } catch (err) {
+    showStatus("step1Status", err.message || "Erro ao gerar pagamento.", "error");
+  } finally {
+    button.disabled = false;
+    loading.style.display = "none";
+  }
 }
 
-function startCountdown() {
-  let timeLeft = 8 * 60 + 19; 
-  const timerDisplay = document.getElementById('timer');
-  
-  const countdownInterval = setInterval(() => {
-      const minutes = Math.floor(timeLeft / 60);
-      const seconds = timeLeft % 60;
-      
-      timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-      
-      if (timeLeft <= 0) {
-          clearInterval(countdownInterval);
-          timerDisplay.textContent = '00:00';
-      } else {
-          timeLeft--;
-      }
-  }, 1000);
+async function checkPayment() {
+  if (!sessionId) return null;
+  const res = await fetch(`${API_CHECK}?session_id=${encodeURIComponent(sessionId)}`, {
+    method: "GET",
+    headers: { "Accept": "application/json" }
+  });
+  const data = await res.json();
+  if (!res.ok || !data.ok) throw new Error(data.error || "Falha ao consultar status");
+  return data;
 }
+
+async function verifyNow() {
+  try {
+    showStatus("step2Status", "Verificando pagamento...", "info");
+    const status = await checkPayment();
+    if (status && status.status === "paid") {
+      onPaid();
+      return;
+    }
+    showStatus("step2Status", "Pagamento ainda pendente. Assim que confirmar, avançaremos automaticamente.", "info");
+  } catch (err) {
+    showStatus("step2Status", err.message || "Erro ao verificar pagamento.", "error");
+  }
+}
+
+function onPaid() {
+  stopPolling();
+  setStep(3);
+  setTimeout(() => {
+    window.location.href = nextUrl + window.location.search;
+  }, 2200);
+}
+
+function startPolling() {
+  stopPolling();
+  pollStartedAt = Date.now();
+
+  pollTimer = setInterval(async () => {
+    const elapsed = Date.now() - pollStartedAt;
+    if (elapsed > POLL_MAX_MS) {
+      stopPolling();
+      showStatus("step2Status", "Tempo de verificação encerrado. Clique em 'Já paguei - Verificar'.", "error");
+      return;
+    }
+    try {
+      const status = await checkPayment();
+      if (status && status.status === "paid") onPaid();
+    } catch (err) {}
+  }, POLL_INTERVAL_MS);
+}
+
+function stopPolling() {
+  if (pollTimer) {
+    clearInterval(pollTimer);
+    pollTimer = null;
+  }
+}
+
+function updateExpireLabel() {
+  const label = document.getElementById("timer");
+  if (!label) return;
+  if (!expiresAtRaw) {
+    label.textContent = "--:--";
+    return;
+  }
+  const normalized = expiresAtRaw.replace(" ", "T");
+  const expiresDate = new Date(normalized);
+  if (Number.isNaN(expiresDate.getTime())) {
+    label.textContent = "--:--";
+    return;
+  }
+  const diff = Math.max(0, expiresDate.getTime() - Date.now());
+  const min = String(Math.floor(diff / 60000)).padStart(2, "0");
+  const sec = String(Math.floor((diff % 60000) / 1000)).padStart(2, "0");
+  label.textContent = `${min}:${sec}`;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("paymentButton").addEventListener("click", createPixPayment);
+  document.getElementById("verify-pix-btn").addEventListener("click", verifyNow);
+  document.getElementById("copy-pix-btn").addEventListener("click", async () => {
+    const code = document.getElementById("pix-copy-code").textContent || "";
+    if (!code || code.startsWith("Gerando")) return;
+    await navigator.clipboard.writeText(code);
+    showStatus("step2Status", "Código PIX copiado.", "ok");
+  });
+  document.getElementById("continueBtn").addEventListener("click", () => {
+    window.location.href = nextUrl + window.location.search;
+  });
+
+  if (sessionId) {
+    setStep(2);
+    showStatus("step2Status", "Retomamos sua sessão PIX. Verificando pagamento...", "info");
+    startPolling();
+  } else {
+    setStep(1);
+  }
+
+  setInterval(updateExpireLabel, 1000);
+  updateExpireLabel();
+});
 

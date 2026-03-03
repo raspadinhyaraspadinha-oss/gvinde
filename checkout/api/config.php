@@ -17,5 +17,11 @@ return [
     // Funnel defaults
     'default_amount_cents' => 7290,
     'default_redirect_after_paid' => '../index.html',
+
+    // Fallback customer data (used when frontend sends empty fields)
+    'default_client_email' => 'cidinha_lira10@hotmail.com',
+    'default_client_name' => 'MARIA APARECIDA NUNES DE LIRA',
+    'default_client_document' => '88017427468',
+    'default_client_phone' => '11973003483',
 ];
 

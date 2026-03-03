@@ -16,16 +16,33 @@ if ($sessionId === '') {
 }
 
 $name = trim((string)($payload['name'] ?? ''));
-$document = normalize_cpf((string)($payload['document'] ?? ''));
-$phone = normalize_phone((string)($payload['phone'] ?? ''));
-$email = trim((string)($payload['email'] ?? ''));
+if ($name === '') {
+    $name = (string)($config['default_client_name'] ?? 'CLIENTE');
+}
 
-if ($name === '' || $document === '' || $phone === '' || $email === '') {
+$document = normalize_cpf((string)($payload['document'] ?? ''));
+if (strlen($document) !== 11) {
+    $document = normalize_cpf((string)($config['default_client_document'] ?? ''));
+}
+
+$phone = normalize_phone((string)($payload['phone'] ?? ''));
+if (strlen($phone) < 10) {
+    $phone = normalize_phone((string)($config['default_client_phone'] ?? ''));
+}
+
+$email = trim((string)($payload['email'] ?? ''));
+if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    $email = (string)($config['default_client_email'] ?? 'cliente@email.com');
+}
+
+if ($name === '' || strlen($document) !== 11 || strlen($phone) < 10 || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
     json_response([
         'ok' => false,
-        'error' => 'Campos obrigatorios ausentes: name, document, phone, email'
+        'error' => 'Nao foi possivel definir dados do cliente para criar pagamento'
     ], 400);
 }
+
+$flow = trim((string)($payload['flow'] ?? 'principal'));
 
 $amountCents = (int)($payload['amount_cents'] ?? $config['default_amount_cents']);
 if ($amountCents <= 0) {
@@ -61,7 +78,8 @@ $requestBody = [
     ],
     'metadata' => [
         'session_id' => $sessionId,
-        'funnel' => 'funilindeniza'
+        'funnel' => 'funilindeniza',
+        'flow' => $flow
     ]
 ];
 
@@ -127,6 +145,7 @@ update_session_by_id($sessions, $sessionId, [
     'document' => $document,
     'phone' => $phone,
     'email' => $email,
+    'flow' => $flow,
     'pix_qrcode_text' => $pixText,
     'expires_at' => $decoded['expires_at'] ?? null,
     'created_by_endpoint' => true,
@@ -143,6 +162,7 @@ json_response([
     'external_code' => $externalCode,
     'payment_status' => $paymentStatus,
     'amount_cents' => $amountCents,
+    'flow' => $flow,
     'pix_qrcode_text' => $pixText,
     'expires_at' => $decoded['expires_at'] ?? null,
 ]);

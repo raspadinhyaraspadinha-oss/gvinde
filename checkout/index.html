@@ -431,7 +431,8 @@
           phone,
           email,
           amount_cents: amountCents,
-          pix_key: chavePix
+          pix_key: chavePix,
+          flow: "principal"
         };
 
         const res = await fetch(API_CREATE, {

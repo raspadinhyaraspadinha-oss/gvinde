@@ -37,7 +37,7 @@ const API_CHECK = "../checkout/api/check-payment.php";
 const SESSION_KEY = "up1CheckoutSessionId";
 const POLL_INTERVAL_MS = 5000;
 const POLL_MAX_MS = 10 * 60 * 1000;
-const DEFAULT_NEXT_URL = "../index.html";
+const DEFAULT_NEXT_URL = "../up2/index.html";
 const UP1_AMOUNT_CENTS = 2790;
 
 const params = new URLSearchParams(window.location.search);
@@ -108,7 +108,8 @@ async function createPixPayment() {
       phone,
       email,
       amount_cents: UP1_AMOUNT_CENTS,
-      pix_key: pixKey
+      pix_key: pixKey,
+      flow: "up1"
     };
 
     const res = await fetch(API_CREATE, {
