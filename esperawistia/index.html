@@ -924,10 +924,13 @@
     }
 
     function applyUnlockedUI() {
-      elements.resgateOverlay.style.display = "flex";
       elements.statusItem.innerHTML = '<i class="fas fa-search"></i> Saque liberado.';
       elements.buttonSaque.style.display = "block";
       renderProgress();
+    }
+
+    function showResgateOverlay() {
+      elements.resgateOverlay.style.display = "flex";
     }
 
     function liberarSaque() {
@@ -947,7 +950,10 @@
       restoreWatchState();
       renderProgress();
 
-      if (progresso.unlocked) applyUnlockedUI();
+      if (progresso.unlocked) {
+        applyUnlockedUI();
+        if (elements.video.ended) showResgateOverlay();
+      }
 
       elements.thumbnailOverlay.style.display = progresso.started ? "none" : "flex";
 
@@ -987,6 +993,10 @@
 
       elements.video.addEventListener("seeked", () => {
         lastVideoTime = elements.video.currentTime || 0;
+      });
+
+      elements.video.addEventListener("ended", () => {
+        showResgateOverlay();
       });
     }
 
